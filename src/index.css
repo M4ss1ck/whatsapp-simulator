@@ -52,15 +52,16 @@ html, body, #root {
 /* Theme toggle styles */
 .sun-icon {
   display: none;
+  color: var(--primary);
 }
 
 .moon-icon {
   display: inline;
+  color: var(--primary);
 }
 
 html.dark .sun-icon {
   display: inline;
-  color: #fcd34d;
 }
 
 html.dark .moon-icon {
@@ -73,7 +74,6 @@ html:not(.dark) .sun-icon {
 
 html:not(.dark) .moon-icon {
   display: inline;
-  color: #6b7280;
 }
 
 /* Component specific styles */
