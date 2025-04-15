@@ -26,22 +26,6 @@ export default function ChatPreview({
     const containerRef = useRef<HTMLDivElement>(null);
     const phoneRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        // Update favicon and title based on chat
-        const favicon = document.getElementById('favicon') as HTMLLinkElement;
-        if (favicon) {
-            if (chatAvatar) {
-                favicon.href = chatAvatar;
-            } else {
-                // Default favicon
-                favicon.href = '/favicon.ico';
-            }
-        }
-
-        // Update page title
-        document.title = chatTitle || 'WhatsApp Simulator';
-    }, [groupTitle, groupAvatar, mode, participants, meId]);
-
     const getParticipantById = (id: string): Participant | undefined => {
         return participants.find(p => p.id === id);
     };
@@ -117,6 +101,22 @@ export default function ChatPreview({
         if (index === 0) return true;
         return messages[index].senderId !== messages[index - 1].senderId;
     };
+
+    useEffect(() => {
+        // Update favicon and title based on chat
+        const favicon = document.getElementById('favicon') as HTMLLinkElement;
+        if (favicon) {
+            if (chatAvatar) {
+                favicon.href = chatAvatar;
+            } else {
+                // Default favicon
+                favicon.href = '/favicon.ico';
+            }
+        }
+
+        // Update page title
+        document.title = chatTitle || 'WhatsApp Simulator';
+    }, [groupTitle, groupAvatar, mode, participants, meId, chatTitle, chatAvatar]);
 
     return (
         <div ref={containerRef} className="w-[375px]">
