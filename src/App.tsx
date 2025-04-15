@@ -244,10 +244,10 @@ function App() {
         </div>
 
         {/* Toggle button in divider */}
-        <div className="hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 w-8">
+        <div className="hidden lg:block">
           <button
             onClick={togglePreviewPosition}
-            className="bg-primary text-white p-2 h-12 w-12 aspect-square rounded-full shadow-lg hover:brightness-110 transition-all flex items-center justify-center"
+            className="preview-switch-button"
             title={previewOnRight ? "Move preview to left" : "Move preview to right"}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -257,19 +257,6 @@ function App() {
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               )}
             </svg>
-          </button>
-        </div>
-
-        {/* Mobile toggle button */}
-        <div className="lg:hidden flex justify-center my-3">
-          <button
-            onClick={togglePreviewPosition}
-            className="bg-primary text-white p-2 rounded-md shadow-lg hover:brightness-110 transition-all flex items-center space-x-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M15 8a.5.5 0 01-.5.5h-9a.5.5 0 010-1h9A.5.5 0 0115 8zm0 5a.5.5 0 01-.5.5h-9a.5.5 0 010-1h9a.5.5 0 010 1z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm">{previewOnRight ? "Move left" : "Move right"}</span>
           </button>
         </div>
 
