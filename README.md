@@ -1,54 +1,90 @@
-# React + TypeScript + Vite
+# WhatsApp Simulator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Create realistic WhatsApp chat screenshots with this simulator. Perfect for mockups, examples, or tutorials.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Customizable Chat Interface**: Create both private and group chats with realistic WhatsApp UI
+- **Participant Management**: Add, edit, and remove chat participants with custom avatars and names
+- **Message Styling**: Accurate message bubbles with tails, timestamps, and sequential grouping
+- **Date Separators**: Automatic or custom date dividers between messages
+- **Phone Status Settings**: Customize battery level and time display
+- **Background Options**: Use the default WhatsApp pattern or upload your own background
+- **Export as Image**: Save your chat mockup as a PNG image with a single click
+- **Dark/Light Theme Support**: Matches your system preferences
+- **Responsive Design**: Works on desktop and mobile devices
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+# Clone the repository
+git clone https://github.com/M4ss1ck/whatsapp-simulator.git
+
+# Navigate to the project directory
+cd whatsapp-simulator
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Usage
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **Manage Participants**: Add participants with names and optional avatars
+2. **Create Messages**: Compose messages from different participants
+3. **Customize Appearance**: Adjust the phone status bar, background, and other settings
+4. **Preview**: See changes instantly in the live preview
+5. **Export**: Click the "Export as Image" button to save your mockup
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Components
+
+### Chat Preview
+
+The main display component that renders a replica of a WhatsApp conversation interface with:
+
+- Phone status bar (time, battery)
+- WhatsApp header with profile picture and name
+- Message bubbles with proper styling based on sender
+- Input area with microphone and attachment buttons
+
+### Participant Manager
+
+Add and manage chat participants with:
+
+- Name input
+- Avatar upload
+- Role selection (you or other participant)
+
+### Chat Settings
+
+Configure chat appearance with options for:
+
+- Chat mode (private or group)
+- Group title and avatar (for group chats)
+- Background image customization
+- Date display format
+
+### Phone Status Settings
+
+Adjust the phone interface elements:
+
+- Custom time display
+- Battery level
+
+## Development
+
+Built with:
+
+- React + TypeScript
+- Vite for fast development
+- Tailwind CSS for styling
+- Hero Icons for UI elements
+- html-to-image for screenshot export functionality
+
+## License
+
+[MIT License](LICENSE)
