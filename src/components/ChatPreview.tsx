@@ -14,6 +14,7 @@ interface ChatPreviewProps {
     phoneStatus: PhoneStatusBar;
     showDateDividers?: boolean;
     customDateFormat?: (date: Date) => string;
+    backgroundImage?: string;
 }
 
 export default function ChatPreview({
@@ -25,7 +26,8 @@ export default function ChatPreview({
     groupAvatar = null,
     phoneStatus,
     showDateDividers = true,
-    customDateFormat
+    customDateFormat,
+    backgroundImage
 }: ChatPreviewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const phoneRef = useRef<HTMLDivElement>(null);
@@ -157,6 +159,23 @@ export default function ChatPreview({
         return messages[index].senderId === messages[index - 1].senderId;
     };
 
+    // Default WhatsApp pattern SVG
+    const defaultPatternSvg = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2000 2000' width='300' height='300'%3E%3Cdefs%3E%3Cpattern id='pattern' patternUnits='userSpaceOnUse' width='300' height='300' patternTransform='scale(7) rotate(0)'%3E%3Cpath d='M150 0L75 200L225 200Z' fill='rgba(0, 0, 0, 0.03)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='%23efeae2'/%3E%3Crect width='100%25' height='100%25' fill='url(%23pattern)'/%3E%3C/svg%3E\")";
+
+    // Get background style based on prop
+    const getChatBackgroundStyle = () => {
+        if (backgroundImage) {
+            return {
+                backgroundImage: `url(${backgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+            };
+        }
+        return {
+            backgroundImage: defaultPatternSvg
+        };
+    };
+
     useEffect(() => {
         // Update favicon and title based on chat
         const favicon = document.getElementById('favicon') as HTMLLinkElement;
@@ -175,7 +194,11 @@ export default function ChatPreview({
 
     return (
         <div ref={containerRef} className="w-[375px]">
-            <div ref={phoneRef} className="bg-[#111b21] rounded-[40px] shadow-2xl overflow-hidden border-8 border-black">
+            <div
+                ref={phoneRef}
+                className="bg-[#111b21] rounded-[40px] shadow-2xl overflow-hidden border-8 border-black"
+                style={getChatBackgroundStyle()}
+            >
                 {/* Phone status bar */}
                 <div className="bg-black text-white h-7 flex items-center justify-between px-5 text-xs">
                     <div>{getCurrentTime()}</div>
@@ -211,10 +234,7 @@ export default function ChatPreview({
 
                 {/* Chat container */}
                 <div
-                    className="bg-[#efeae2] p-3 h-[500px] overflow-y-auto"
-                    style={{
-                        backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2000 2000' width='300' height='300'%3E%3Cdefs%3E%3Cpattern id='pattern' patternUnits='userSpaceOnUse' width='300' height='300' patternTransform='scale(7) rotate(0)'%3E%3Cpath d='M150 0L75 200L225 200Z' fill='rgba(0, 0, 0, 0.03)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='%23efeae2'/%3E%3Crect width='100%25' height='100%25' fill='url(%23pattern)'/%3E%3C/svg%3E\")",
-                    }}
+                    className="p-3 h-[500px] overflow-y-auto"
                 >
                     {processedMessages.length === 0 ? (
                         <div className="flex items-center justify-center h-full text-gray-700">
@@ -320,8 +340,11 @@ export default function ChatPreview({
                 </div>
 
                 {/* Bottom input area (visual only) */}
-                <div className="bg-[#f0f2f5] p-2 border-t border-gray-300 flex items-center">
-                    <div className="flex-1 flex items-center bg-[#ffffff] rounded-full px-3 py-2 mr-2">
+                <div
+                    className="p-2 flex items-center relative"
+                >
+                    {/* Input content - above the overlay */}
+                    <div className="flex-1 flex items-center bg-[#ffffff] rounded-full px-3 py-2 mr-2 z-10 relative">
                         {/* Sticker button */}
                         <button className="text-[#8696a0] mr-2 flex-shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -355,7 +378,7 @@ export default function ChatPreview({
                     </div>
 
                     {/* Microphone button */}
-                    <button className="w-10 h-10 rounded-full bg-[#00a884] flex items-center justify-center text-white flex-shrink-0">
+                    <button className="w-10 h-10 rounded-full bg-[#00a884] flex items-center justify-center text-white flex-shrink-0 z-10 relative">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                             <path d="M12 15.5c1.93 0 3.5-1.57 3.5-3.5V5.5c0-1.93-1.57-3.5-3.5-3.5S8.5 3.57 8.5 5.5V12c0 1.93 1.57 3.5 3.5 3.5Z"></path>
                             <path d="M12 18.5c-3.584 0-6.5-2.916-6.5-6.5v-1a.5.5 0 0 1 1 0v1c0 3.032 2.468 5.5 5.5 5.5s5.5-2.468 5.5-5.5v-1a.5.5 0 0 1 1 0v1c0 3.584-2.916 6.5-6.5 6.5Z"></path>

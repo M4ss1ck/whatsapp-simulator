@@ -67,6 +67,7 @@ function App() {
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null)
   const [showDateDividers, setShowDateDividers] = useState(true)
   const [customDateText, setCustomDateText] = useState('')
+  const [chatBackground, setChatBackground] = useState('/whatsapp-bg.png')
 
   const handleAddParticipant = (newParticipant: Omit<Participant, 'id'>) => {
     const participant = {
@@ -238,6 +239,7 @@ function App() {
             groupAvatar={state.chatSettings.avatar}
             phoneStatus={state.phoneStatus}
             showDateDividers={showDateDividers}
+            backgroundImage={chatBackground}
           />
         </div>
 
@@ -342,6 +344,30 @@ function App() {
                 <p className="text-xs text-gray-500 mt-1">
                   Add custom date separators between messages.
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Background Settings Section */}
+          <div className="phone-settings p-4 rounded-lg">
+            <h2 className="text-lg font-semibold mb-4">Chat Background</h2>
+
+            <div className="mb-4">
+              <p className="text-xs text-gray-500 mb-2">
+                The WhatsApp pattern background is currently using a custom image.
+              </p>
+
+              <div className="mt-4">
+                <label className="text-sm font-medium mb-2 block">Custom Background URL:</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={chatBackground}
+                    onChange={(e) => setChatBackground(e.target.value)}
+                    placeholder="Enter image URL"
+                    className="w-full p-2 border rounded time-input"
+                  />
+                </div>
               </div>
             </div>
           </div>
