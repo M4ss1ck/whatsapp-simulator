@@ -1,5 +1,8 @@
 {
   "name": "wa-sim",
   "compatibility_date": "2025-04-15",
-  "main": "src/main.tsx"
+  "main": "src/main.tsx",
+  "build": {
+    "conditions": ["style"]
+  }
 }
