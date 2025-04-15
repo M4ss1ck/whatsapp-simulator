@@ -12,6 +12,8 @@ interface ChatPreviewProps {
     groupTitle?: string;
     groupAvatar?: string | null;
     phoneStatus: PhoneStatusBar;
+    showDateDividers?: boolean;
+    customDateFormat?: (date: Date) => string;
 }
 
 export default function ChatPreview({
@@ -21,7 +23,9 @@ export default function ChatPreview({
     meId,
     groupTitle = 'Group Chat',
     groupAvatar = null,
-    phoneStatus
+    phoneStatus,
+    showDateDividers = true,
+    customDateFormat
 }: ChatPreviewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const phoneRef = useRef<HTMLDivElement>(null);
@@ -45,6 +49,9 @@ export default function ChatPreview({
     };
 
     const formatDate = (date: Date): string => {
+        if (customDateFormat) {
+            return customDateFormat(date);
+        }
         return date.toLocaleDateString([], {
             day: 'numeric',
             month: 'short',
@@ -66,15 +73,38 @@ export default function ChatPreview({
         }
     };
 
-    // Group messages by date
-    const messagesByDate = messages.reduce<Record<string, Message[]>>((groups, message) => {
-        const dateStr = message.timestamp.toDateString();
-        if (!groups[dateStr]) {
-            groups[dateStr] = [];
+    // Identify system date messages
+    const isSystemDateMessage = (message: Message): boolean => {
+        return message.senderId === 'system_date';
+    };
+
+    // Filter messages to prevent consecutive system date messages
+    const processedMessages = messages.reduce<Message[]>((result, message, index, array) => {
+        // If this is a system date message, check if the previous one was also a system message
+        if (isSystemDateMessage(message) && index > 0 && isSystemDateMessage(array[index - 1])) {
+            // Skip this message (don't add consecutive system messages)
+            return result;
         }
-        groups[dateStr].push(message);
-        return groups;
-    }, {});
+        result.push(message);
+        return result;
+    }, []);
+
+    // Group messages by date, but only if showDateDividers is true and there are no system date messages
+    const shouldGroupByDate = showDateDividers && !processedMessages.some(isSystemDateMessage);
+
+    const messagesByDate = shouldGroupByDate
+        ? processedMessages.reduce<Record<string, Message[]>>((groups, message) => {
+            // Skip grouping for system date messages (they create their own groups)
+            if (isSystemDateMessage(message)) return groups;
+
+            const dateStr = message.timestamp.toDateString();
+            if (!groups[dateStr]) {
+                groups[dateStr] = [];
+            }
+            groups[dateStr].push(message);
+            return groups;
+        }, {})
+        : { 'all': processedMessages }; // If not grouping by date, put all messages in one group
 
     // Get other participant for private chat header
     const otherParticipant = mode === 'private' && meId
@@ -98,7 +128,14 @@ export default function ChatPreview({
     // Function to determine if a message should show the sender's avatar
     // Only show avatar for the first message in a sequence from the same sender
     const shouldShowAvatar = (messages: Message[], index: number): boolean => {
+        // System date messages don't have avatars
+        if (isSystemDateMessage(messages[index])) return false;
+
         if (index === 0) return true;
+
+        // If previous message was a system date message, always show avatar
+        if (isSystemDateMessage(messages[index - 1])) return true;
+
         return messages[index].senderId !== messages[index - 1].senderId;
     };
 
@@ -109,7 +146,14 @@ export default function ChatPreview({
 
     // Function to determine if a message is part of a sequence
     const isSequentialMessage = (messages: Message[], index: number): boolean => {
+        // System date messages are never sequential
+        if (isSystemDateMessage(messages[index])) return false;
+
         if (index === 0) return false;
+
+        // If previous message was a system date message, not sequential
+        if (isSystemDateMessage(messages[index - 1])) return false;
+
         return messages[index].senderId === messages[index - 1].senderId;
     };
 
@@ -172,20 +216,34 @@ export default function ChatPreview({
                         backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2000 2000' width='300' height='300'%3E%3Cdefs%3E%3Cpattern id='pattern' patternUnits='userSpaceOnUse' width='300' height='300' patternTransform='scale(7) rotate(0)'%3E%3Cpath d='M150 0L75 200L225 200Z' fill='rgba(0, 0, 0, 0.03)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='%23efeae2'/%3E%3Crect width='100%25' height='100%25' fill='url(%23pattern)'/%3E%3C/svg%3E\")",
                     }}
                 >
-                    {messages.length === 0 ? (
+                    {processedMessages.length === 0 ? (
                         <div className="flex items-center justify-center h-full text-gray-700">
                             No messages yet
                         </div>
                     ) : (
                         Object.entries(messagesByDate).map(([dateStr, dateMessages]) => (
                             <div key={dateStr}>
-                                <div className="flex justify-center my-3">
-                                    <div className="bg-[#ffffff] px-3 py-1 rounded-lg text-xs text-gray-700 font-medium shadow-sm">
-                                        {formatDate(new Date(dateStr))}
+                                {/* Only show auto-generated date dividers if showDateDividers is true and we're not on 'all' */}
+                                {showDateDividers && dateStr !== 'all' && (
+                                    <div className="flex justify-center my-3">
+                                        <div className="bg-[#ffffff] px-3 py-1 rounded-lg text-xs text-gray-700 font-medium shadow-sm">
+                                            {formatDate(new Date(dateStr))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {dateMessages.map((message, index) => {
+                                    // If this is a system date message, render it as a date divider
+                                    if (isSystemDateMessage(message)) {
+                                        return (
+                                            <div key={message.id} className="flex justify-center my-3">
+                                                <div className="bg-[#ffffff] px-3 py-1 rounded-lg text-xs text-gray-700 font-medium shadow-sm">
+                                                    {message.text}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+
                                     const sender = getParticipantById(message.senderId);
                                     const isMe = sender?.id === meId;
                                     const showName = mode === 'group' && !isMe && shouldShowAvatar(dateMessages, index);
