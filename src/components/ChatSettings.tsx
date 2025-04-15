@@ -46,7 +46,7 @@ export default function ChatSettings({
         : null;
 
     return (
-        <div className="bg-gray-100 p-4 rounded-lg">
+        <div className="chat-settings p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Chat Settings</h2>
 
             <div className="mb-4">

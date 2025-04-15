@@ -35,6 +35,20 @@ function App() {
     localStorage.setItem('previewOnRight', JSON.stringify(previewOnRight));
   }, [previewOnRight]);
 
+  // Initialize dark mode from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('darkMode');
+    const prefersDark = savedTheme !== null ? JSON.parse(savedTheme) : true;
+    document.documentElement.classList.toggle('dark', prefersDark);
+  }, []);
+
+  // Toggle theme
+  const toggleTheme = () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    document.documentElement.classList.toggle('dark', !isDark);
+    localStorage.setItem('darkMode', JSON.stringify(!isDark));
+  };
+
   const [state, setState] = useState<WhatsAppState>({
     participants: [],
     messages: [],
@@ -174,8 +188,22 @@ function App() {
   };
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center sticky top-0 bg-[#111b21] py-4 z-20">WhatsApp Conversation Simulator</h1>
+    <div className="container mx-auto px-4 min-h-screen">
+      <div className="sticky top-0 py-4 z-20 flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-center mx-auto">WhatsApp Conversation Simulator</h1>
+        <button
+          onClick={toggleTheme}
+          className="absolute right-4 p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
+          title="Toggle light/dark theme"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 sun-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 moon-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
 
       <div className="flex flex-col lg:flex-row lg:items-start relative">
         {/* Preview - conditionally ordered based on previewOnRight */}
@@ -195,7 +223,7 @@ function App() {
         <div className="hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 w-8">
           <button
             onClick={togglePreviewPosition}
-            className="bg-[#00a884] text-white p-2 h-12 w-12 aspect-square rounded-full shadow-lg hover:bg-[#008069] transition-colors flex items-center justify-center"
+            className="bg-primary text-white p-2 h-12 w-12 aspect-square rounded-full shadow-lg hover:brightness-110 transition-all flex items-center justify-center"
             title={previewOnRight ? "Move preview to left" : "Move preview to right"}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -205,6 +233,19 @@ function App() {
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               )}
             </svg>
+          </button>
+        </div>
+
+        {/* Mobile toggle button */}
+        <div className="lg:hidden flex justify-center my-3">
+          <button
+            onClick={togglePreviewPosition}
+            className="bg-primary text-white p-2 rounded-md shadow-lg hover:brightness-110 transition-all flex items-center space-x-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M15 8a.5.5 0 01-.5.5h-9a.5.5 0 010-1h9A.5.5 0 0115 8zm0 5a.5.5 0 01-.5.5h-9a.5.5 0 010-1h9a.5.5 0 010 1z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm">{previewOnRight ? "Move left" : "Move right"}</span>
           </button>
         </div>
 

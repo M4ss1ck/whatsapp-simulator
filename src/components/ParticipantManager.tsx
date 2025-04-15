@@ -37,7 +37,7 @@ export default function ParticipantManager({
     };
 
     return (
-        <div className="bg-gray-100 p-4 rounded-lg">
+        <div className="participant-manager p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Participants</h2>
 
             <form onSubmit={handleSubmit} className="mb-4">

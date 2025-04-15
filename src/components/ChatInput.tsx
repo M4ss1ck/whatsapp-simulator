@@ -38,7 +38,7 @@ export default function ChatInput({
     };
 
     return (
-        <div className="bg-gray-100 p-4 rounded-lg">
+        <div className="chat-input p-4 rounded-lg">
             <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Send as:</label>
                 <select

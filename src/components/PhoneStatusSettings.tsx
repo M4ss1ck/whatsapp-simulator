@@ -42,7 +42,7 @@ export default function PhoneStatusSettings({
     };
 
     return (
-        <div className="bg-gray-100 p-4 rounded-lg">
+        <div className="phone-settings p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Phone Settings</h2>
 
             <div className="mb-4">
@@ -55,7 +55,7 @@ export default function PhoneStatusSettings({
                     max="100"
                     value={batteryLevel}
                     onChange={handleBatteryChange}
-                    className="w-full accent-[#00a884]"
+                    className="w-full accent-primary"
                 />
             </div>
 
@@ -66,7 +66,7 @@ export default function PhoneStatusSettings({
                         id="custom-time"
                         checked={showCustomTime}
                         onChange={handleToggleCustomTime}
-                        className="mr-2 accent-[#00a884]"
+                        className="mr-2 accent-primary"
                     />
                     <label htmlFor="custom-time" className="text-sm font-medium">
                         Custom Time
@@ -78,7 +78,7 @@ export default function PhoneStatusSettings({
                         type="time"
                         value={timeValue}
                         onChange={handleTimeChange}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded time-input"
                     />
                 )}
             </div>
