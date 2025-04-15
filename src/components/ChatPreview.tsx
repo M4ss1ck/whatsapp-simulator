@@ -102,6 +102,17 @@ export default function ChatPreview({
         return messages[index].senderId !== messages[index - 1].senderId;
     };
 
+    // Function to determine if a message should show the tail (arrow)
+    const shouldShowTail = (messages: Message[], index: number): boolean => {
+        return shouldShowAvatar(messages, index);
+    };
+
+    // Function to determine if a message is part of a sequence
+    const isSequentialMessage = (messages: Message[], index: number): boolean => {
+        if (index === 0) return false;
+        return messages[index].senderId === messages[index - 1].senderId;
+    };
+
     useEffect(() => {
         // Update favicon and title based on chat
         const favicon = document.getElementById('favicon') as HTMLLinkElement;
@@ -177,52 +188,63 @@ export default function ChatPreview({
                                 {dateMessages.map((message, index) => {
                                     const sender = getParticipantById(message.senderId);
                                     const isMe = sender?.id === meId;
-                                    const showAvatar = !isMe && shouldShowAvatar(dateMessages, index);
                                     const showName = mode === 'group' && !isMe && shouldShowAvatar(dateMessages, index);
+                                    const showTail = shouldShowTail(dateMessages, index);
+                                    const isSequential = isSequentialMessage(dateMessages, index);
 
                                     return (
-                                        <div key={message.id} className="mb-1">
+                                        <div key={message.id} className={`${isSequential ? 'mb-0.5' : isMe ? 'mb-2' : 'mb-3'}`}>
                                             {showName && sender && (
-                                                <div className="text-xs text-gray-600 ml-12 mb-1">
+                                                <div className="text-xs text-gray-600 pl-10 mb-0.5">
                                                     {sender.name}
                                                 </div>
                                             )}
 
                                             <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                                {/* Show avatar only for first message in a sequence from this sender */}
-                                                {showAvatar && sender && (
-                                                    <div className="self-end mr-1">
-                                                        {sender.avatar ? (
-                                                            <img
-                                                                src={sender.avatar}
-                                                                alt={sender.name}
-                                                                className="h-8 w-8 rounded-full object-cover"
-                                                                onError={(e) => {
-                                                                    e.currentTarget.style.display = 'none';
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
-                                                                {sender.name.charAt(0).toUpperCase()}
-                                                            </div>
+                                                {/* Create a fixed-width container for avatar to maintain alignment */}
+                                                {!isMe && (
+                                                    <div className="self-end mr-1 min-w-[36px] w-9 flex justify-center">
+                                                        {!isSequential && sender && (
+                                                            <>
+                                                                {sender.avatar ? (
+                                                                    <img
+                                                                        src={sender.avatar}
+                                                                        alt={sender.name}
+                                                                        className="h-8 w-8 rounded-full object-cover"
+                                                                        onError={(e) => {
+                                                                            e.currentTarget.style.display = 'none';
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                                                        {sender.name.charAt(0).toUpperCase()}
+                                                                    </div>
+                                                                )}
+                                                            </>
                                                         )}
                                                     </div>
                                                 )}
 
                                                 {/* Message content */}
                                                 <div
-                                                    className={`max-w-[70%] p-2 rounded-lg relative ${isMe ? 'bg-[#d9fdd3]' : 'bg-white'
-                                                        } ${showAvatar || !isMe ? 'rounded-tl-none' : ''} ${isMe ? 'rounded-tr-none' : ''}`}
+                                                    className={`max-w-[70%] p-2 relative
+                                                    ${isMe ? 'bg-[#d9fdd3]' : 'bg-white'} 
+                                                    ${isSequential ? 'mt-0.5' : 'mt-0'} 
+                                                    rounded-lg
+                                                    ${!isSequential && isMe ? 'rounded-tr-none' : ''}
+                                                    ${!isSequential && !isMe ? 'rounded-tl-none' : ''}
+                                                    `}
                                                 >
-                                                    {/* Message tail */}
-                                                    <div
-                                                        className={`absolute top-0 w-3 h-3 ${isMe ? 'right-0 -mr-1 bg-[#d9fdd3]' : 'left-0 -ml-1 bg-white'
-                                                            } ${showAvatar || !isMe ? '' : 'hidden'}`}
-                                                        style={{
-                                                            transform: isMe ? 'skew(40deg)' : 'skew(-40deg)',
-                                                            borderRadius: '2px'
-                                                        }}
-                                                    />
+                                                    {/* Message tail - only show for first message in a sequence */}
+                                                    {showTail && (
+                                                        <div
+                                                            className={`absolute top-0 w-3 h-3 ${isMe ? 'right-0 -mr-1 bg-[#d9fdd3]' : 'left-0 -ml-1 bg-white'}`}
+                                                            style={{
+                                                                transform: isMe ? 'skew(40deg)' : 'skew(-40deg)',
+                                                                borderRadius: '2px'
+                                                            }}
+                                                        />
+                                                    )}
 
                                                     <div className="text-sm">{message.text}</div>
 
