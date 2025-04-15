@@ -321,7 +321,48 @@ export default function ChatPreview({
 
                 {/* Bottom input area (visual only) */}
                 <div className="bg-[#f0f2f5] p-2 border-t border-gray-300 flex items-center">
-                    <div className="w-full h-10 bg-[#ffffff] rounded-full"></div>
+                    <div className="flex-1 flex items-center bg-[#ffffff] rounded-full px-3 py-2 mr-2">
+                        {/* Sticker button */}
+                        <button className="text-[#8696a0] mr-2 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path>
+                                <path d="M8.5 9a1.5 1.5 0 1 1-.001 3.001A1.5 1.5 0 0 1 8.5 9zm7 0a1.5 1.5 0 1 1-.001 3.001A1.5 1.5 0 0 1 15.5 9zM12 17.5c-2.33 0-4.308-1.613-4.95-3.5h9.9c-.642 1.887-2.62 3.5-4.95 3.5z"></path>
+                            </svg>
+                        </button>
+
+                        {/* Blinking cursor area (simulating text input) */}
+                        <div className="flex-1 h-6 flex items-center">
+                            <div className="h-4 w-0.5 bg-[#00a884] animate-pulse"></div>
+                        </div>
+
+                        {/* Right-side icons */}
+                        <div className="flex items-center space-x-4 text-[#8696a0]">
+                            {/* Attachment icon */}
+                            <button className="flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                    <path d="M19.858 11.093l-5.4-5.4a4.225 4.225 0 0 0-5.971 0 4.225 4.225 0 0 0 0 5.971l5.4 5.4a2.539 2.539 0 0 0 3.6 0 2.539 2.539 0 0 0 0-3.6l-5.4-5.4a.849.849 0 0 0-1.2 0 .849.849 0 0 0 0 1.2l5.4 5.4a.849.849 0 1 1-1.2 1.2l-5.4-5.4a2.539 2.539 0 1 1 3.6-3.6l5.4 5.4a4.225 4.225 0 0 1-5.971 5.971l-5.4-5.4a5.9 5.9 0 0 1 0-8.341 5.9 5.9 0 0 1 8.341 0l5.4 5.4a.849.849 0 0 0 1.2-1.2Z"></path>
+                                </svg>
+                            </button>
+
+                            {/* Camera icon */}
+                            <button className="flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                    <path d="M12 16.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-7.5a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"></path>
+                                    <path d="M20.5 22h-17A2.5 2.5 0 0 1 1 19.5v-12A2.5 2.5 0 0 1 3.5 5h3.768l1.575-2.624A1.5 1.5 0 0 1 10.232 1.5h3.536a1.5 1.5 0 0 1 1.389.874L16.732 5H20.5A2.5 2.5 0 0 1 23 7.5v12a2.5 2.5 0 0 1-2.5 2.5ZM3.5 6.5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h17a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-4.232a.5.5 0 0 1-.429-.243L14.268 3H9.732L8.16 6.257a.5.5 0 0 1-.428.243H3.5Z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Microphone button */}
+                    <button className="w-10 h-10 rounded-full bg-[#00a884] flex items-center justify-center text-white flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M12 15.5c1.93 0 3.5-1.57 3.5-3.5V5.5c0-1.93-1.57-3.5-3.5-3.5S8.5 3.57 8.5 5.5V12c0 1.93 1.57 3.5 3.5 3.5Z"></path>
+                            <path d="M12 18.5c-3.584 0-6.5-2.916-6.5-6.5v-1a.5.5 0 0 1 1 0v1c0 3.032 2.468 5.5 5.5 5.5s5.5-2.468 5.5-5.5v-1a.5.5 0 0 1 1 0v1c0 3.584-2.916 6.5-6.5 6.5Z"></path>
+                            <path d="M12 21.5a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 1 0v3a.5.5 0 0 1-.5.5Z"></path>
+                            <path d="M15 21.5H9a.5.5 0 0 1 0-1h6a.5.5 0 0 1 0 1Z"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
