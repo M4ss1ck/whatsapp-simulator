@@ -160,7 +160,7 @@ export default function ChatPreview({
     };
 
     // Default WhatsApp pattern SVG
-    const defaultPatternSvg = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2000 2000' width='300' height='300'%3E%3Cdefs%3E%3Cpattern id='pattern' patternUnits='userSpaceOnUse' width='300' height='300' patternTransform='scale(7) rotate(0)'%3E%3Cpath d='M150 0L75 200L225 200Z' fill='rgba(0, 0, 0, 0.03)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='%23efeae2'/%3E%3Crect width='100%25' height='100%25' fill='url(%23pattern)'/%3E%3C/svg%3E\")";
+    const defaultPatternSvg = "url(/whatsapp-bg.png)";
 
     // Get background style based on prop
     const getChatBackgroundStyle = () => {

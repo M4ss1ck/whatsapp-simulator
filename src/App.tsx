@@ -67,7 +67,7 @@ function App() {
   const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null)
   const [showDateDividers, setShowDateDividers] = useState(true)
   const [customDateText, setCustomDateText] = useState('')
-  const [chatBackground, setChatBackground] = useState('/whatsapp-bg.png')
+  const [chatBackground, setChatBackground] = useState('')
 
   const handleAddParticipant = (newParticipant: Omit<Participant, 'id'>) => {
     const participant = {
