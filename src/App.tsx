@@ -192,10 +192,10 @@ function App() {
         </div>
 
         {/* Toggle button in divider */}
-        <div className="hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30">
+        <div className="hidden lg:flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 w-8">
           <button
             onClick={togglePreviewPosition}
-            className="bg-[#00a884] text-white p-2 h-12 w-6 rounded-full shadow-lg hover:bg-[#008069] transition-colors flex items-center justify-center"
+            className="bg-[#00a884] text-white p-2 h-12 w-12 aspect-square rounded-full shadow-lg hover:bg-[#008069] transition-colors flex items-center justify-center"
             title={previewOnRight ? "Move preview to left" : "Move preview to right"}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -208,21 +208,8 @@ function App() {
           </button>
         </div>
 
-        {/* Mobile toggle button */}
-        <div className="lg:hidden flex justify-center my-3">
-          <button
-            onClick={togglePreviewPosition}
-            className="bg-[#00a884] text-white p-2 rounded-md shadow-lg hover:bg-[#008069] transition-colors flex items-center space-x-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M15 8a.5.5 0 01-.5.5h-9a.5.5 0 010-1h9A.5.5 0 0115 8zm0 5a.5.5 0 01-.5.5h-9a.5.5 0 010-1h9a.5.5 0 010 1z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm">{previewOnRight ? "Move left" : "Move right"}</span>
-          </button>
-        </div>
-
         {/* Input Controls - conditionally ordered based on previewOnRight */}
-        <div className={`w-full lg:w-1/2 ${previewOnRight ? 'lg:pr-4 order-1 lg:order-1' : 'lg:pl-4 order-1 lg:order-2'} space-y-6 mb-8 lg:mb-0`}>
+        <div className={`w-full lg:w-1/2 ${previewOnRight ? 'lg:pr-4 order-1 lg:order-1' : 'lg:pl-4 order-1 lg:order-2'} space-y-6 mb-8`}>
           <ParticipantManager
             participants={state.participants}
             onAddParticipant={handleAddParticipant}
