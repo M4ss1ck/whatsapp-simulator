@@ -173,14 +173,14 @@ export default function ChatPreview({
                     }}
                 >
                     {messages.length === 0 ? (
-                        <div className="flex items-center justify-center h-full text-gray-500">
+                        <div className="flex items-center justify-center h-full text-gray-700">
                             No messages yet
                         </div>
                     ) : (
                         Object.entries(messagesByDate).map(([dateStr, dateMessages]) => (
                             <div key={dateStr}>
                                 <div className="flex justify-center my-3">
-                                    <div className="bg-[#ffffff] px-3 py-1 rounded-lg text-xs text-gray-600 shadow-sm">
+                                    <div className="bg-[#ffffff] px-3 py-1 rounded-lg text-xs text-gray-700 font-medium shadow-sm">
                                         {formatDate(new Date(dateStr))}
                                     </div>
                                 </div>
@@ -195,7 +195,7 @@ export default function ChatPreview({
                                     return (
                                         <div key={message.id} className={`${isSequential ? 'mb-0.5' : isMe ? 'mb-2' : 'mb-3'}`}>
                                             {showName && sender && (
-                                                <div className="text-xs text-gray-600 pl-10 mb-0.5">
+                                                <div className="text-xs text-gray-800 pl-10 mb-0.5">
                                                     {sender.name}
                                                 </div>
                                             )}
@@ -216,7 +216,7 @@ export default function ChatPreview({
                                                                         }}
                                                                     />
                                                                 ) : (
-                                                                    <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
+                                                                    <div className="h-8 w-8 bg-[#cccccc] rounded-full flex items-center justify-center text-gray-800">
                                                                         {sender.name.charAt(0).toUpperCase()}
                                                                     </div>
                                                                 )}
@@ -227,8 +227,8 @@ export default function ChatPreview({
 
                                                 {/* Message content */}
                                                 <div
-                                                    className={`max-w-[70%] p-2 relative
-                                                    ${isMe ? 'bg-[#d9fdd3]' : 'bg-white'} 
+                                                    className={`max-w-[70%] p-2 relative text-gray-800
+                                                    ${isMe ? 'bg-[#d9fdd3]' : 'bg-[#ffffff]'} 
                                                     ${isSequential ? 'mt-0.5' : 'mt-0'} 
                                                     rounded-lg
                                                     ${!isSequential && isMe ? 'rounded-tr-none' : ''}
@@ -238,7 +238,7 @@ export default function ChatPreview({
                                                     {/* Message tail - only show for first message in a sequence */}
                                                     {showTail && (
                                                         <div
-                                                            className={`absolute top-0 w-3 h-3 ${isMe ? 'right-0 -mr-1 bg-[#d9fdd3]' : 'left-0 -ml-1 bg-white'}`}
+                                                            className={`absolute top-0 w-3 h-3 ${isMe ? 'right-0 -mr-1 bg-[#d9fdd3]' : 'left-0 -ml-1 bg-[#ffffff]'}`}
                                                             style={{
                                                                 transform: isMe ? 'skew(40deg)' : 'skew(-40deg)',
                                                                 borderRadius: '2px'
@@ -246,9 +246,9 @@ export default function ChatPreview({
                                                         />
                                                     )}
 
-                                                    <div className="text-sm">{message.text}</div>
+                                                    <div className="text-sm text-gray-800">{message.text}</div>
 
-                                                    <div className="text-[10px] text-gray-500 text-right mt-1">
+                                                    <div className="text-[10px] text-gray-600 text-right mt-1">
                                                         {formatTime(message.timestamp)}
                                                     </div>
                                                 </div>
@@ -263,7 +263,7 @@ export default function ChatPreview({
 
                 {/* Bottom input area (visual only) */}
                 <div className="bg-[#f0f2f5] p-2 border-t border-gray-300 flex items-center">
-                    <div className="w-full h-10 bg-white rounded-full"></div>
+                    <div className="w-full h-10 bg-[#ffffff] rounded-full"></div>
                 </div>
             </div>
 
