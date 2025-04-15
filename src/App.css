@@ -1,21 +1,104 @@
+/* Base container styling */
 #root {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  text-align: left;
+}
+
+body {
+  background-color: #111b21;
+  color: #e9edef;
+}
+
+.bg-gray-100 {
+  background-color: #222e35;
+  color: #e9edef;
+  border: 1px solid #374248;
+}
+
+.bg-white {
+  background-color: #222e35;
+  color: #e9edef;
+}
+
+.border {
+  border-color: #374248;
+}
+
+.text-gray-500 {
+  color: #8696a0;
+}
+
+.text-gray-600 {
+  color: #8696a0;
+}
+
+input, select {
+  background-color: #2a3942;
+  color: #e9edef;
+}
+
+input::-webkit-input-placeholder {
+  color: #8696a0;
+}
+
+input::-moz-placeholder {
+  color: #8696a0;
+}
+
+input:-ms-input-placeholder {
+  color: #8696a0;
+}
+
+input::-ms-input-placeholder {
+  color: #8696a0;
+}
+
+input::placeholder {
+  color: #8696a0;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Custom WhatsApp styled container */
+.whatsapp-container {
+  max-width: 400px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
 }
 
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
+  transition: -webkit-filter 300ms;
   transition: filter 300ms;
+  transition: filter 300ms, -webkit-filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  -webkit-filter: drop-shadow(0 0 2em #646cffaa);
+          filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  -webkit-filter: drop-shadow(0 0 2em #61dafbaa);
+          filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@-webkit-keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes logo-spin {
@@ -29,7 +112,8 @@
 
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+    -webkit-animation: logo-spin infinite 20s linear;
+            animation: logo-spin infinite 20s linear;
   }
 }
 
