@@ -1,5 +1,3 @@
-import { ChatMode } from './components/ChatSettings';
-
 export interface Participant {
     id: string;
     name: string;
@@ -18,7 +16,7 @@ export interface Message {
 }
 
 export interface ChatSettings {
-    mode: ChatMode;
+    mode: 'private' | 'group';
     title: string;
     avatar: string | null;
 }
