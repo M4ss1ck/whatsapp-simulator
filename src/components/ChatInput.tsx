@@ -116,7 +116,7 @@ export default function ChatInput({
             <h2 className="text-lg font-semibold mb-4">Send Message</h2>
 
             {/* Reply preview */}
-            {replyToMessage && (
+            {replyToMessage ? (
                 <div className="mb-4 p-3 bg-gray-100 rounded-lg relative">
                     <button
                         onClick={onCancelReply}
@@ -133,7 +133,9 @@ export default function ChatInput({
                         {getMessagePreview(replyToMessage)}
                     </div>
                 </div>
-            )}
+            ) : <div className="mb-4 text-gray-600 text-sm">
+                Click a message to respond it
+            </div>}
 
             <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Select Sender:</label>
