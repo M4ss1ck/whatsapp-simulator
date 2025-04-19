@@ -11,8 +11,10 @@ export interface Message {
     senderId: string;
     text: string;
     timestamp: Date;
-    type: 'text' | 'audio';
-    audioDuration?: string; // Format: HH:MM:SS
+    type: 'text' | 'audio' | 'image';
+    audioDuration?: string; // Format: MM:SS
+    imageUrl?: string; // URL of the image
+    imageCaption?: string; // Optional caption for images
 }
 
 export interface ChatSettings {

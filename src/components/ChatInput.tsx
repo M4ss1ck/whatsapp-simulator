@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Message, Participant } from '../types';
 
 interface ChatInputProps {
@@ -15,8 +15,36 @@ export default function ChatInput({
     onMessageSend
 }: ChatInputProps) {
     const [messageText, setMessageText] = useState('');
-    const [messageType, setMessageType] = useState<'text' | 'audio'>('text');
+    const [messageType, setMessageType] = useState<'text' | 'audio' | 'image'>('text');
     const [audioDuration, setAudioDuration] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
+    const [imageCaption, setImageCaption] = useState('');
+    const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('file');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [imageData, setImageData] = useState<string | null>(null);
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+            setSelectedFile(file);
+
+            // Read the file as a data URL
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target?.result) {
+                    setImageData(event.target.result as string);
+                }
+            };
+            reader.readAsDataURL(file);
+
+            setImageUrl(''); // Clear URL input when file is selected
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,16 +55,41 @@ export default function ChatInput({
             return;
         }
 
-        onMessageSend({
+        if (messageType === 'image') {
+            if (uploadMethod === 'url' && !imageUrl) {
+                alert('Please enter an image URL');
+                return;
+            }
+            if (uploadMethod === 'file' && !selectedFile) {
+                alert('Please select an image file');
+                return;
+            }
+        }
+
+        const message: Omit<Message, 'id'> = {
             senderId: selectedParticipant.id,
-            text: messageType === 'audio' ? 'Audio message' : messageText,
+            text: messageType === 'text' ? messageText : messageType === 'audio' ? 'Audio message' : (imageCaption || 'Image'),
             timestamp: new Date(),
             type: messageType,
-            audioDuration: messageType === 'audio' ? audioDuration : undefined
-        });
+            ...(messageType === 'audio' && { audioDuration }),
+            ...(messageType === 'image' && {
+                imageUrl: uploadMethod === 'file' ? imageData! : imageUrl,
+                ...(imageCaption && { imageCaption })
+            })
+        };
 
+        onMessageSend(message);
+
+        // Reset form
         setMessageText('');
         setAudioDuration('');
+        setImageUrl('');
+        setImageCaption('');
+        setSelectedFile(null);
+        setImageData(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     return (
@@ -85,6 +138,16 @@ export default function ChatInput({
                         />
                         Audio
                     </label>
+                    <label className="flex items-center">
+                        <input
+                            type="radio"
+                            value="image"
+                            checked={messageType === 'image'}
+                            onChange={() => setMessageType('image')}
+                            className="mr-2"
+                        />
+                        Image
+                    </label>
                 </div>
             </div>
 
@@ -99,7 +162,7 @@ export default function ChatInput({
                         rows={3}
                     />
                 </div>
-            ) : (
+            ) : messageType === 'audio' ? (
                 <div className="mb-4">
                     <label className="block text-sm font-medium mb-1">Audio Duration (HH:MM:SS):</label>
                     <input
@@ -114,12 +177,100 @@ export default function ChatInput({
                         Enter duration in HH:MM:SS format (e.g., 00:01:30 for 1 minute and 30 seconds)
                     </p>
                 </div>
+            ) : (
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Upload Method:</label>
+                        <div className="flex space-x-4">
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    value="file"
+                                    checked={uploadMethod === 'file'}
+                                    onChange={() => setUploadMethod('file')}
+                                    className="mr-2"
+                                />
+                                Upload File
+                            </label>
+                            <label className="flex items-center">
+                                <input
+                                    type="radio"
+                                    value="url"
+                                    checked={uploadMethod === 'url'}
+                                    onChange={() => setUploadMethod('url')}
+                                    className="mr-2"
+                                />
+                                Image URL
+                            </label>
+                        </div>
+                    </div>
+
+                    {uploadMethod === 'file' ? (
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Choose Image:</label>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                className="w-full p-2 border rounded"
+                            />
+                            {imageData && (
+                                <div className="mt-2">
+                                    <img
+                                        src={imageData}
+                                        alt="Preview"
+                                        className="max-w-full h-auto rounded-lg max-h-48 object-contain"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Image URL:</label>
+                            <input
+                                type="url"
+                                value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
+                                placeholder="https://example.com/image.jpg"
+                                className="w-full p-2 border rounded"
+                            />
+                            {imageUrl && (
+                                <div className="mt-2">
+                                    <img
+                                        src={imageUrl}
+                                        alt="Preview"
+                                        className="max-w-full h-auto rounded-lg max-h-48 object-contain"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                        }}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Image Caption (optional):</label>
+                        <input
+                            type="text"
+                            value={imageCaption}
+                            onChange={(e) => setImageCaption(e.target.value)}
+                            placeholder="Add a caption..."
+                            className="w-full p-2 border rounded"
+                        />
+                    </div>
+                </div>
             )}
 
             <button
                 type="submit"
                 onClick={handleSubmit}
-                disabled={!selectedParticipant || (messageType === 'text' && !messageText.trim())}
+                disabled={!selectedParticipant ||
+                    (messageType === 'text' && !messageText.trim()) ||
+                    (messageType === 'audio' && !audioDuration) ||
+                    (messageType === 'image' && uploadMethod === 'url' && !imageUrl) ||
+                    (messageType === 'image' && uploadMethod === 'file' && !selectedFile)}
                 className="bg-[#00a884] text-white px-4 py-2 rounded disabled:opacity-50"
             >
                 Send Message

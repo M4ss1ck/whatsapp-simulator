@@ -415,6 +415,28 @@ export default function ChatPreview({
                                                                     {formatAudioDuration(message.audioDuration)}
                                                                 </div>
                                                             </div>
+                                                        ) : message.type === 'image' ? (
+                                                            <div className="space-y-1 min-w-[200px]">
+                                                                {/* Image container with fixed aspect ratio */}
+                                                                <div className="relative w-full pt-[75%] rounded-lg overflow-hidden bg-gray-100">
+                                                                    <img
+                                                                        src={message.imageUrl}
+                                                                        alt={message.imageCaption || "Image"}
+                                                                        className="absolute inset-0 w-full h-full object-cover"
+                                                                        onError={(e) => {
+                                                                            // Replace broken image with placeholder
+                                                                            e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="%23cccccc"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>';
+                                                                        }}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Optional image caption */}
+                                                                {message.imageCaption && (
+                                                                    <div className="text-sm text-gray-800">
+                                                                        {message.imageCaption}
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         ) : (
                                                             <div className="text-sm text-gray-800">{message.text}</div>
                                                         )}
