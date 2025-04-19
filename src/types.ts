@@ -13,6 +13,9 @@ export interface Message {
     audioDuration?: string; // Format: MM:SS
     imageUrl?: string; // URL of the image
     imageCaption?: string; // Optional caption for images
+    replyToId?: string; // ID of the message being replied to
+    replyToPreview?: string; // Preview text of the replied message (useful for deleted messages)
+    replyToType?: 'text' | 'audio' | 'image'; // Type of the message being replied to
 }
 
 export interface ChatSettings {

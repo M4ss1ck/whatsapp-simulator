@@ -15,6 +15,7 @@ interface ChatPreviewProps {
     showDateDividers?: boolean;
     customDateFormat?: (date: Date) => string;
     backgroundImage?: string;
+    onMessageClick?: (message: Message) => void;
 }
 
 export default function ChatPreview({
@@ -27,13 +28,31 @@ export default function ChatPreview({
     phoneStatus,
     showDateDividers = true,
     customDateFormat,
-    backgroundImage
+    backgroundImage,
+    onMessageClick
 }: ChatPreviewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const phoneRef = useRef<HTMLDivElement>(null);
 
     const getParticipantById = (id: string): Participant | undefined => {
         return participants.find(p => p.id === id);
+    };
+
+    // Get the message being replied to
+    const getRepliedMessage = (replyToId: string): Message | undefined => {
+        return messages.find(m => m.id === replyToId);
+    };
+
+    // Get a preview text for a message
+    const getMessagePreview = (message: Message): string => {
+        switch (message.type) {
+            case 'audio':
+                return 'Voice message';
+            case 'image':
+                return message.imageCaption || 'Photo';
+            default:
+                return message.text.length > 50 ? message.text.substring(0, 47) + '...' : message.text;
+        }
     };
 
     const formatTime = (date: Date): string => {
@@ -371,8 +390,32 @@ export default function ChatPreview({
                                                         rounded-lg
                                                         ${!isSequential && isMe ? 'rounded-tr-none' : ''}
                                                         ${!isSequential && !isMe ? 'rounded-tl-none' : ''}
+                                                        ${onMessageClick ? 'cursor-pointer hover:bg-opacity-90' : ''}
                                                         `}
+                                                        onClick={() => onMessageClick?.(message)}
                                                     >
+                                                        {/* Reply preview if this is a response */}
+                                                        {message.replyToId && (
+                                                            <div className={`mb-1 p-2 rounded border-l-4 ${isMe ? 'bg-[#c5f3c0] border-[#25d366]' : 'bg-[#f5f5f5] border-[#25d366]'}`}>
+                                                                {(() => {
+                                                                    const repliedMessage = getRepliedMessage(message.replyToId);
+                                                                    const repliedSender = repliedMessage ? getParticipantById(repliedMessage.senderId) : undefined;
+                                                                    return (
+                                                                        <>
+                                                                            <div className="text-[#25d366] font-medium text-sm">
+                                                                                {repliedSender?.name || 'Unknown'}
+                                                                            </div>
+                                                                            <div className="text-gray-600 text-sm">
+                                                                                {repliedMessage
+                                                                                    ? getMessagePreview(repliedMessage)
+                                                                                    : message.replyToPreview || 'Message not available'}
+                                                                            </div>
+                                                                        </>
+                                                                    );
+                                                                })()}
+                                                            </div>
+                                                        )}
+
                                                         {/* Message tail - only show for first message in a sequence */}
                                                         {showTail && (
                                                             <div

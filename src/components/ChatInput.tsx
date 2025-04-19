@@ -6,13 +6,17 @@ interface ChatInputProps {
     selectedParticipant: Participant | null;
     onParticipantChange: (participant: Participant) => void;
     onMessageSend: (message: Omit<Message, 'id'>) => void;
+    replyToMessage?: Message; // Message being replied to
+    onCancelReply?: () => void; // Function to cancel reply
 }
 
 export default function ChatInput({
     participants,
     selectedParticipant,
     onParticipantChange,
-    onMessageSend
+    onMessageSend,
+    replyToMessage,
+    onCancelReply
 }: ChatInputProps) {
     const [messageText, setMessageText] = useState('');
     const [messageType, setMessageType] = useState<'text' | 'audio' | 'image'>('text');
@@ -22,6 +26,18 @@ export default function ChatInput({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageData, setImageData] = useState<string | null>(null);
+
+    // Get a preview text for a message
+    const getMessagePreview = (message: Message): string => {
+        switch (message.type) {
+            case 'audio':
+                return 'Voice message';
+            case 'image':
+                return message.imageCaption || 'Photo';
+            default:
+                return message.text.length > 50 ? message.text.substring(0, 47) + '...' : message.text;
+        }
+    };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -70,6 +86,11 @@ export default function ChatInput({
             ...(messageType === 'image' && {
                 imageUrl: imageData || imageUrl,
                 ...(imageCaption && { imageCaption })
+            }),
+            ...(replyToMessage && {
+                replyToId: replyToMessage.id,
+                replyToPreview: getMessagePreview(replyToMessage),
+                replyToType: replyToMessage.type
             })
         };
 
@@ -85,11 +106,34 @@ export default function ChatInput({
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+        if (onCancelReply) {
+            onCancelReply();
+        }
     };
 
     return (
         <div className="chat-input p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Send Message</h2>
+
+            {/* Reply preview */}
+            {replyToMessage && (
+                <div className="mb-4 p-3 bg-gray-100 rounded-lg relative">
+                    <button
+                        onClick={onCancelReply}
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                    </button>
+                    <div className="text-sm font-medium text-gray-700">
+                        Replying to message:
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                        {getMessagePreview(replyToMessage)}
+                    </div>
+                </div>
+            )}
 
             <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Select Sender:</label>

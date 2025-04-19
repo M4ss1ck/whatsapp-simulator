@@ -70,6 +70,7 @@ function App() {
   const [showDateDividers, setShowDateDividers] = useState(true)
   const [customDateText, setCustomDateText] = useState('')
   const [chatBackground, setChatBackground] = useState('')
+  const [replyToMessage, setReplyToMessage] = useState<Message | undefined>(undefined)
 
   const handleAddParticipant = (newParticipant: Omit<Participant, 'id'>) => {
     const participant = {
@@ -158,7 +159,8 @@ function App() {
       id: uuidv4(),
       senderId: 'system_date',
       text: customDateText,
-      timestamp: new Date()
+      timestamp: new Date(),
+      type: 'text' // System date messages are always text type
     };
 
     setState(prev => ({
@@ -211,6 +213,16 @@ function App() {
     setPreviewOnRight((prev: boolean) => !prev);
   };
 
+  const handleMessageClick = (message: Message) => {
+    // Don't allow replying to system date messages
+    if (message.senderId === 'system_date') return;
+    setReplyToMessage(message);
+  };
+
+  const handleCancelReply = () => {
+    setReplyToMessage(undefined);
+  };
+
   return (
     <div className="container mx-auto px-4 min-h-screen">
       <div className="sticky top-0 py-4 z-20 flex justify-between items-center mb-8">
@@ -242,6 +254,7 @@ function App() {
             phoneStatus={state.phoneStatus}
             showDateDividers={showDateDividers}
             backgroundImage={chatBackground}
+            onMessageClick={handleMessageClick}
           />
         </div>
 
@@ -308,6 +321,8 @@ function App() {
             selectedParticipant={selectedParticipant}
             onParticipantChange={handleParticipantChange}
             onMessageSend={handleMessageSend}
+            replyToMessage={replyToMessage}
+            onCancelReply={handleCancelReply}
           />
         </div>
       </div>
