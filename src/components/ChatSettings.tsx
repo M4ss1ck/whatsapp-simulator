@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { Participant } from '../types';
 
 export type ChatMode = 'group' | 'private';
@@ -23,12 +24,40 @@ export default function ChatSettings({
     avatar,
     onAvatarChange
 }: ChatSettingsProps) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
     // Need at least 2 participants for any chat
     const hasEnoughParticipants = participants.length >= 2;
     // Need exactly 2 participants for private chat
     const validForPrivateChat = participants.length === 2;
     // Need to have a "me" participant
     const hasMe = meId !== null;
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const dataUrl = e.target?.result as string;
+            onAvatarChange(dataUrl);
+            setIsUploading(false);
+        };
+
+        reader.onerror = () => {
+            setIsUploading(false);
+            alert('Error uploading image. Please try again.');
+        };
+
+        reader.readAsDataURL(file);
+    };
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
 
     // Error messages
     const getErrorMessage = () => {
@@ -94,28 +123,54 @@ export default function ChatSettings({
                     </div>
 
                     <div className="mb-3">
-                        <label className="block text-sm font-medium mb-1">Group Avatar URL (optional):</label>
-                        <input
-                            type="text"
-                            value={avatar || ''}
-                            onChange={(e) => onAvatarChange(e.target.value ? e.target.value : null)}
-                            placeholder="Enter group image URL"
-                            className="w-full p-2 border rounded"
-                        />
-
-                        <div className="mt-2 flex justify-center">
-                            {avatar ? (
-                                <img
-                                    src={avatar}
-                                    alt="Group avatar preview"
-                                    className="h-16 w-16 rounded-full object-cover border-2 border-[#00a884]"
-                                    onError={() => onAvatarChange(null)}
+                        <label className="block text-sm font-medium mb-1">Group Avatar:</label>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Avatar URL:</label>
+                                <input
+                                    type="text"
+                                    value={avatar || ''}
+                                    onChange={(e) => onAvatarChange(e.target.value ? e.target.value : null)}
+                                    placeholder="Enter group image URL"
+                                    className="w-full p-2 border rounded"
                                 />
-                            ) : (
-                                <div className="h-16 w-16 bg-[#00a884] rounded-full flex items-center justify-center text-white text-xl font-semibold">
-                                    {title ? title.charAt(0).toUpperCase() : '?'}
-                                </div>
-                            )}
+                            </div>
+
+                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                                <label className="block text-sm font-medium mb-1">Upload Image:</label>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileUpload}
+                                    accept="image/*"
+                                    className="hidden"
+                                />
+                                <button
+                                    onClick={handleUploadClick}
+                                    disabled={isUploading}
+                                    className="w-full bg-primary text-white px-3 py-2 rounded disabled:opacity-50"
+                                >
+                                    {isUploading ? 'Uploading...' : 'Choose Image'}
+                                </button>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Upload an image from your device to use as group avatar.
+                                </p>
+                            </div>
+
+                            <div className="flex justify-center">
+                                {avatar ? (
+                                    <img
+                                        src={avatar}
+                                        alt="Group avatar preview"
+                                        className="h-16 w-16 rounded-full object-cover border-2 border-[#00a884]"
+                                        onError={() => onAvatarChange(null)}
+                                    />
+                                ) : (
+                                    <div className="h-16 w-16 bg-[#00a884] rounded-full flex items-center justify-center text-white text-xl font-semibold">
+                                        {title ? title.charAt(0).toUpperCase() : '?'}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </>
