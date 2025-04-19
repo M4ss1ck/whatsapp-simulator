@@ -5,6 +5,8 @@ import ChatPreview from './components/ChatPreview'
 import ParticipantManager from './components/ParticipantManager'
 import ChatSettings, { ChatMode } from './components/ChatSettings'
 import PhoneStatusSettings from './components/PhoneStatusSettings'
+import DateSettings from './components/DateSettings'
+import BackgroundSettings from './components/BackgroundSettings'
 import { Message, Participant, WhatsAppState, PhoneStatusBar } from './types'
 import './App.css'
 
@@ -288,76 +290,18 @@ function App() {
             onStatusChange={handlePhoneStatusChange}
           />
 
-          {/* Date Settings Section */}
-          <div className="phone-settings p-4 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Date Settings</h2>
+          <DateSettings
+            showDateDividers={showDateDividers}
+            onShowDateDividersChange={setShowDateDividers}
+            customDateText={customDateText}
+            onCustomDateTextChange={setCustomDateText}
+            onAddDateMessage={handleAddDateMessage}
+          />
 
-            <div className="mb-4">
-              <div className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  id="show-dates"
-                  checked={showDateDividers}
-                  onChange={() => setShowDateDividers(prev => !prev)}
-                  className="mr-2 accent-primary"
-                />
-                <label htmlFor="show-dates" className="text-sm font-medium">
-                  Show automatic date dividers
-                </label>
-              </div>
-              <p className="text-xs text-gray-500 mb-4">
-                When enabled, messages will be grouped by date with date headers.
-              </p>
-
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold mb-2">Add Custom Date Message</h3>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={customDateText}
-                    onChange={(e) => setCustomDateText(e.target.value)}
-                    placeholder="e.g., 'Yesterday' or 'Last week'"
-                    className="w-full p-2 border rounded time-input"
-                    disabled={!showDateDividers}
-                  />
-                  <button
-                    onClick={handleAddDateMessage}
-                    disabled={!customDateText.trim() || !showDateDividers}
-                    className="bg-primary text-white px-3 py-1 rounded disabled:opacity-50"
-                  >
-                    Add
-                  </button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Add custom date separators between messages.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Background Settings Section */}
-          <div className="phone-settings p-4 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Chat Background</h2>
-
-            <div className="mb-4">
-              <p className="text-xs text-gray-500 mb-2">
-                The WhatsApp pattern background is currently using a custom image.
-              </p>
-
-              <div className="mt-4">
-                <label className="text-sm font-medium mb-2 block">Custom Background URL:</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={chatBackground}
-                    onChange={(e) => setChatBackground(e.target.value)}
-                    placeholder="Enter image URL"
-                    className="w-full p-2 border rounded time-input"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <BackgroundSettings
+            backgroundImage={chatBackground}
+            onBackgroundImageChange={setChatBackground}
+          />
 
           <ChatInput
             participants={state.participants}
