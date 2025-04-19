@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { toPng } from 'html-to-image';
 import { Message, Participant, PhoneStatusBar } from '../types';
 import { ChatMode } from './ChatSettings';
@@ -20,6 +20,7 @@ interface ImportedData {
     phoneStatus: PhoneStatusBar;
     showDateDividers: boolean;
     chatBackground: string;
+    conversationTitle: string;
 }
 
 interface ChatPreviewProps {
@@ -54,6 +55,7 @@ export default function ChatPreview({
     const containerRef = useRef<HTMLDivElement>(null);
     const phoneRef = useRef<HTMLDivElement>(null);
     const importFileRef = useRef<HTMLInputElement>(null);
+    const [conversationTitle, setConversationTitle] = useState('My WhatsApp Chat');
 
     const getParticipantById = (id: string): Participant | undefined => {
         return participants.find(p => p.id === id);
@@ -131,7 +133,8 @@ export default function ChatPreview({
         try {
             const dataUrl = await toPng(phoneRef.current);
             const link = document.createElement('a');
-            link.download = `whatsapp-chat-${new Date().toISOString().slice(0, 10)}.png`;
+            const safeTitle = conversationTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+            link.download = `${safeTitle}-${new Date().toISOString().slice(0, 10)}.png`;
             link.href = dataUrl;
             link.click();
         } catch (error) {
@@ -151,14 +154,16 @@ export default function ChatPreview({
             meId,
             phoneStatus,
             showDateDividers,
-            chatBackground: backgroundImage || ''
+            chatBackground: backgroundImage || '',
+            conversationTitle
         };
 
         const dataStr = JSON.stringify(exportData, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
         const url = URL.createObjectURL(dataBlob);
         const link = document.createElement('a');
-        link.download = `whatsapp-chat-data-${new Date().toISOString().slice(0, 10)}.json`;
+        const safeTitle = conversationTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+        link.download = `${safeTitle}-${new Date().toISOString().slice(0, 10)}.json`;
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
@@ -172,6 +177,9 @@ export default function ChatPreview({
         reader.onload = (e) => {
             try {
                 const importedData = JSON.parse(e.target?.result as string) as ImportedData;
+                if (importedData.conversationTitle) {
+                    setConversationTitle(importedData.conversationTitle);
+                }
                 if (onStateImport) {
                     onStateImport(importedData);
                 }
@@ -306,6 +314,17 @@ export default function ChatPreview({
 
     return (
         <div>
+            {/* Conversation title input */}
+            <div className="mb-4">
+                <input
+                    type="text"
+                    value={conversationTitle}
+                    onChange={(e) => setConversationTitle(e.target.value)}
+                    placeholder="Enter conversation title..."
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#25d366] focus:ring-1 focus:ring-[#25d366] outline-none transition-colors duration-200"
+                />
+            </div>
+
             <div ref={containerRef} className="w-[375px]">
                 <div
                     ref={phoneRef}
