@@ -19,7 +19,6 @@ export default function ChatInput({
     const [audioDuration, setAudioDuration] = useState('');
     const [imageUrl, setImageUrl] = useState('');
     const [imageCaption, setImageCaption] = useState('');
-    const [uploadMethod, setUploadMethod] = useState<'url' | 'file'>('file');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imageData, setImageData] = useState<string | null>(null);
@@ -56,12 +55,8 @@ export default function ChatInput({
         }
 
         if (messageType === 'image') {
-            if (uploadMethod === 'url' && !imageUrl) {
-                alert('Please enter an image URL');
-                return;
-            }
-            if (uploadMethod === 'file' && !selectedFile) {
-                alert('Please select an image file');
+            if (imageData === null && !imageUrl) {
+                alert('Please select an image or enter an image URL');
                 return;
             }
         }
@@ -73,7 +68,7 @@ export default function ChatInput({
             type: messageType,
             ...(messageType === 'audio' && { audioDuration }),
             ...(messageType === 'image' && {
-                imageUrl: uploadMethod === 'file' ? imageData! : imageUrl,
+                imageUrl: imageData || imageUrl,
                 ...(imageCaption && { imageCaption })
             })
         };
@@ -179,68 +174,31 @@ export default function ChatInput({
                 </div>
             ) : (
                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Upload Method:</label>
-                        <div className="flex space-x-4">
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
-                                    value="file"
-                                    checked={uploadMethod === 'file'}
-                                    onChange={() => setUploadMethod('file')}
-                                    className="mr-2"
-                                />
-                                Upload File
-                            </label>
-                            <label className="flex items-center">
-                                <input
-                                    type="radio"
-                                    value="url"
-                                    checked={uploadMethod === 'url'}
-                                    onChange={() => setUploadMethod('url')}
-                                    className="mr-2"
-                                />
-                                Image URL
-                            </label>
-                        </div>
-                    </div>
-
-                    {uploadMethod === 'file' ? (
+                    <div className="mb-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Choose Image:</label>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileSelect}
-                                className="w-full p-2 border rounded"
-                            />
-                            {imageData && (
-                                <div className="mt-2">
-                                    <img
-                                        src={imageData}
-                                        alt="Preview"
-                                        className="max-w-full h-auto rounded-lg max-h-48 object-contain"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div>
-                            <label className="block text-sm font-medium mb-1">Image URL:</label>
+                            <label className="block text-sm font-medium mb-2">Paste image URL:</label>
                             <input
                                 type="url"
                                 value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
+                                onChange={(e) => {
+                                    setImageUrl(e.target.value);
+                                    if (selectedFile) {
+                                        setSelectedFile(null);
+                                        setImageData(null);
+                                        if (fileInputRef.current) {
+                                            fileInputRef.current.value = '';
+                                        }
+                                    }
+                                }}
                                 placeholder="https://example.com/image.jpg"
                                 className="w-full p-2 border rounded"
                             />
-                            {imageUrl && (
-                                <div className="mt-2">
+                            {imageUrl && !imageData && (
+                                <div className="mt-4">
                                     <img
                                         src={imageUrl}
                                         alt="Preview"
-                                        className="max-w-full h-auto rounded-lg max-h-48 object-contain"
+                                        className="max-w-full h-auto rounded max-h-48 object-contain"
                                         onError={(e) => {
                                             e.currentTarget.style.display = 'none';
                                         }}
@@ -248,9 +206,45 @@ export default function ChatInput({
                                 </div>
                             )}
                         </div>
-                    )}
 
-                    <div>
+                        <div className="relative my-6">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                <span className="px-4 text-gray-500 bg-white">OR</span>
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            <div className="bg-[#00a884] text-white py-3 px-4 rounded text-center cursor-pointer">
+                                Choose Image
+                            </div>
+                            {selectedFile && (
+                                <p className="text-sm text-gray-600 mt-2">
+                                    Selected: {selectedFile.name}
+                                </p>
+                            )}
+                            {imageData && (
+                                <div className="mt-4">
+                                    <img
+                                        src={imageData}
+                                        alt="Preview"
+                                        className="max-w-full h-auto rounded max-h-48 object-contain"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">Image Caption (optional):</label>
                         <input
                             type="text"
@@ -269,8 +263,7 @@ export default function ChatInput({
                 disabled={!selectedParticipant ||
                     (messageType === 'text' && !messageText.trim()) ||
                     (messageType === 'audio' && !audioDuration) ||
-                    (messageType === 'image' && uploadMethod === 'url' && !imageUrl) ||
-                    (messageType === 'image' && uploadMethod === 'file' && !selectedFile)}
+                    (messageType === 'image' && imageData === null && !imageUrl)}
                 className="bg-[#00a884] text-white px-4 py-2 rounded disabled:opacity-50"
             >
                 Send Message
