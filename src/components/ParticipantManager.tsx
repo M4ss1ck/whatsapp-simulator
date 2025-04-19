@@ -81,10 +81,10 @@ export default function ParticipantManager({
                 </div>
 
                 <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">Avatar:</label>
+                    <label className="block text-sm font-medium mb-1">Image:</label>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Avatar URL:</label>
+                            <label className="block text-sm font-medium mb-1">URL:</label>
                             <input
                                 type="text"
                                 value={avatarUrl}
@@ -94,8 +94,9 @@ export default function ParticipantManager({
                             />
                         </div>
 
-                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                            <label className="block text-sm font-medium mb-1">Upload Image:</label>
+                        <div className="relative border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <div className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white dark:bg-gray-800 px-2 text-sm text-gray-500">OR</div>
+                            <label className="block text-sm font-medium mb-1">Upload:</label>
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -112,7 +113,7 @@ export default function ParticipantManager({
                                 {isUploading ? 'Uploading...' : 'Choose Image'}
                             </button>
                             <p className="text-xs text-gray-500 mt-1">
-                                Upload an image from your device to use as avatar.
+                                Upload an image from your device
                             </p>
                         </div>
 
@@ -120,7 +121,7 @@ export default function ParticipantManager({
                             {avatarUrl ? (
                                 <img
                                     src={avatarUrl}
-                                    alt="Avatar preview"
+                                    alt="Image preview"
                                     className="h-16 w-16 rounded-full object-cover border-2 border-[#00a884]"
                                     onError={() => setAvatarUrl('')}
                                 />

@@ -123,21 +123,22 @@ export default function ChatSettings({
                     </div>
 
                     <div className="mb-3">
-                        <label className="block text-sm font-medium mb-1">Group Avatar:</label>
+                        <label className="block text-sm font-medium mb-1">Group Image:</label>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Avatar URL:</label>
+                                <label className="block text-sm font-medium mb-1">URL:</label>
                                 <input
                                     type="text"
                                     value={avatar || ''}
                                     onChange={(e) => onAvatarChange(e.target.value ? e.target.value : null)}
-                                    placeholder="Enter group image URL"
+                                    placeholder="Enter image URL"
                                     className="w-full p-2 border rounded"
                                 />
                             </div>
 
-                            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                                <label className="block text-sm font-medium mb-1">Upload Image:</label>
+                            <div className="relative border-t border-gray-200 dark:border-gray-700 pt-4">
+                                <div className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white dark:bg-gray-800 px-2 text-sm text-gray-500">OR</div>
+                                <label className="block text-sm font-medium mb-1">Upload:</label>
                                 <input
                                     type="file"
                                     ref={fileInputRef}
@@ -153,7 +154,7 @@ export default function ChatSettings({
                                     {isUploading ? 'Uploading...' : 'Choose Image'}
                                 </button>
                                 <p className="text-xs text-gray-500 mt-1">
-                                    Upload an image from your device to use as group avatar.
+                                    Upload an image from your device
                                 </p>
                             </div>
 
@@ -161,7 +162,7 @@ export default function ChatSettings({
                                 {avatar ? (
                                     <img
                                         src={avatar}
-                                        alt="Group avatar preview"
+                                        alt="Group image preview"
                                         className="h-16 w-16 rounded-full object-cover border-2 border-[#00a884]"
                                         onError={() => onAvatarChange(null)}
                                     />
