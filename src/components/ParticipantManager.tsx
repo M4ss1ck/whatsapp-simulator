@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { UserPlusIcon, TrashIcon } from '@heroicons/react/24/solid';
 import { Participant } from '../types';
 
@@ -21,6 +21,33 @@ export default function ParticipantManager({
 }: ParticipantManagerProps) {
     const [name, setName] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const dataUrl = e.target?.result as string;
+            setAvatarUrl(dataUrl);
+            setIsUploading(false);
+        };
+
+        reader.onerror = () => {
+            setIsUploading(false);
+            alert('Error uploading image. Please try again.');
+        };
+
+        reader.readAsDataURL(file);
+    };
+
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,15 +81,56 @@ export default function ParticipantManager({
                 </div>
 
                 <div className="mb-3">
-                    <label className="block text-sm font-medium mb-1">Avatar URL (optional):</label>
-                    <input
-                        type="text"
-                        value={avatarUrl}
-                        onChange={(e) => setAvatarUrl(e.target.value)}
-                        placeholder="Enter image URL"
-                        className="w-full p-2 border rounded"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Leave empty to use first letter of name</p>
+                    <label className="block text-sm font-medium mb-1">Avatar:</label>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Avatar URL:</label>
+                            <input
+                                type="text"
+                                value={avatarUrl}
+                                onChange={(e) => setAvatarUrl(e.target.value)}
+                                placeholder="Enter image URL"
+                                className="w-full p-2 border rounded"
+                            />
+                        </div>
+
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <label className="block text-sm font-medium mb-1">Upload Image:</label>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileUpload}
+                                accept="image/*"
+                                className="hidden"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleUploadClick}
+                                disabled={isUploading}
+                                className="w-full bg-primary text-white px-3 py-2 rounded disabled:opacity-50"
+                            >
+                                {isUploading ? 'Uploading...' : 'Choose Image'}
+                            </button>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Upload an image from your device to use as avatar.
+                            </p>
+                        </div>
+
+                        <div className="flex justify-center">
+                            {avatarUrl ? (
+                                <img
+                                    src={avatarUrl}
+                                    alt="Avatar preview"
+                                    className="h-16 w-16 rounded-full object-cover border-2 border-[#00a884]"
+                                    onError={() => setAvatarUrl('')}
+                                />
+                            ) : (
+                                <div className="h-16 w-16 bg-[#00a884] rounded-full flex items-center justify-center text-white text-xl font-semibold">
+                                    {name ? name.charAt(0).toUpperCase() : '?'}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 <button
