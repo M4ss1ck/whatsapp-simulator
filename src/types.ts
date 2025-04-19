@@ -11,6 +11,8 @@ export interface Message {
     senderId: string;
     text: string;
     timestamp: Date;
+    type: 'text' | 'audio';
+    audioDuration?: string; // Format: HH:MM:SS
 }
 
 export interface ChatSettings {

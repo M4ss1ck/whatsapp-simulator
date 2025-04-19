@@ -61,6 +61,30 @@ export default function ChatPreview({
         });
     };
 
+    const formatAudioDuration = (duration: string | undefined): string => {
+        if (!duration) return '0:00';
+
+        // Split the duration into hours, minutes, seconds
+        const parts = duration.split(':');
+
+        // If it's already in mm:ss format, return as is
+        if (parts.length === 2) return duration;
+
+        // If it's in HH:mm:ss format, convert to mm:ss
+        if (parts.length === 3) {
+            const hours = parseInt(parts[0]);
+            const minutes = parseInt(parts[1]);
+            const seconds = parts[2];
+
+            // Calculate total minutes
+            const totalMinutes = hours * 60 + minutes;
+
+            return `${totalMinutes}:${seconds}`;
+        }
+
+        return '0:00';
+    };
+
     const exportAsImage = async () => {
         if (!phoneRef.current) return;
 
@@ -360,7 +384,40 @@ export default function ChatPreview({
                                                             />
                                                         )}
 
-                                                        <div className="text-sm text-gray-800">{message.text}</div>
+                                                        {message.type === 'audio' ? (
+                                                            <div className="flex items-center space-x-2">
+                                                                {/* Play button */}
+                                                                <button className="w-8 h-8 rounded-full bg-[#00a884] flex items-center justify-center text-white flex-shrink-0">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                                                        <path d="M8 5v14l11-7z" />
+                                                                    </svg>
+                                                                </button>
+
+                                                                {/* Waveform */}
+                                                                <div className="flex-1 h-[26px]">
+                                                                    <div className="w-full h-full flex items-center">
+                                                                        {[...Array(40)].map((_, i) => (
+                                                                            <div
+                                                                                key={i}
+                                                                                className={`flex-1 mx-[0.5px] ${isMe ? 'bg-[#2d7c64]' : 'bg-[#8696a0]'} opacity-40`}
+                                                                                style={{
+                                                                                    height: `${Math.abs(Math.sin((i + 1) * 0.5) * 100)}%`,
+                                                                                    minHeight: '15%',
+                                                                                    maxHeight: '95%'
+                                                                                }}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Duration */}
+                                                                <div className="text-[13px] text-gray-600 whitespace-nowrap pl-1">
+                                                                    {formatAudioDuration(message.audioDuration)}
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="text-sm text-gray-800">{message.text}</div>
+                                                        )}
 
                                                         <div className="text-[10px] text-gray-600 text-right mt-1">
                                                             {formatTime(message.timestamp)}
