@@ -10,6 +10,24 @@ import BackgroundSettings from './components/BackgroundSettings'
 import { Message, Participant, WhatsAppState, PhoneStatusBar } from './types'
 import './App.css'
 
+interface ImportedMessage extends Omit<Message, 'timestamp'> {
+  timestamp: string;
+}
+
+interface ImportedData {
+  participants: Participant[];
+  messages: ImportedMessage[];
+  chatSettings: {
+    mode: ChatMode;
+    title: string;
+    avatar: string | null;
+  };
+  meId: string | null;
+  phoneStatus: PhoneStatusBar;
+  showDateDividers: boolean;
+  chatBackground: string;
+}
+
 // Create a link element for the favicon
 const createFaviconLink = () => {
   const link = document.getElementById('favicon') as HTMLLinkElement || document.createElement('link');
@@ -223,6 +241,29 @@ function App() {
     setReplyToMessage(undefined);
   };
 
+  const handleStateImport = (importedData: ImportedData) => {
+    // Restore dates from JSON (they come as strings)
+    const processedMessages = importedData.messages.map((msg: ImportedMessage) => ({
+      ...msg,
+      timestamp: new Date(msg.timestamp)
+    }));
+
+    setState({
+      participants: importedData.participants,
+      messages: processedMessages,
+      chatSettings: importedData.chatSettings,
+      meId: importedData.meId,
+      phoneStatus: importedData.phoneStatus
+    });
+
+    if (importedData.showDateDividers !== undefined) {
+      setShowDateDividers(importedData.showDateDividers);
+    }
+    if (importedData.chatBackground !== undefined) {
+      setChatBackground(importedData.chatBackground);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 min-h-screen">
       <div className="sticky top-0 py-4 z-20 flex justify-between items-center mb-8">
@@ -255,6 +296,7 @@ function App() {
             showDateDividers={showDateDividers}
             backgroundImage={chatBackground}
             onMessageClick={handleMessageClick}
+            onStateImport={handleStateImport}
           />
         </div>
 

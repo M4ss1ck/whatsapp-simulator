@@ -4,6 +4,24 @@ import { Message, Participant, PhoneStatusBar } from '../types';
 import { ChatMode } from './ChatSettings';
 import { Battery100Icon } from '@heroicons/react/24/solid';
 
+interface ImportedMessage extends Omit<Message, 'timestamp'> {
+    timestamp: string;
+}
+
+interface ImportedData {
+    participants: Participant[];
+    messages: ImportedMessage[];
+    chatSettings: {
+        mode: ChatMode;
+        title: string;
+        avatar: string | null;
+    };
+    meId: string | null;
+    phoneStatus: PhoneStatusBar;
+    showDateDividers: boolean;
+    chatBackground: string;
+}
+
 interface ChatPreviewProps {
     messages: Message[];
     participants: Participant[];
@@ -16,6 +34,7 @@ interface ChatPreviewProps {
     customDateFormat?: (date: Date) => string;
     backgroundImage?: string;
     onMessageClick?: (message: Message) => void;
+    onStateImport?: (data: ImportedData) => void;
 }
 
 export default function ChatPreview({
@@ -29,10 +48,12 @@ export default function ChatPreview({
     showDateDividers = true,
     customDateFormat,
     backgroundImage,
-    onMessageClick
+    onMessageClick,
+    onStateImport
 }: ChatPreviewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const phoneRef = useRef<HTMLDivElement>(null);
+    const importFileRef = useRef<HTMLInputElement>(null);
 
     const getParticipantById = (id: string): Participant | undefined => {
         return participants.find(p => p.id === id);
@@ -116,6 +137,54 @@ export default function ChatPreview({
         } catch (error) {
             console.error('Error exporting image:', error);
         }
+    };
+
+    const handleExportState = () => {
+        const exportData = {
+            participants,
+            messages,
+            chatSettings: {
+                mode,
+                title: groupTitle,
+                avatar: groupAvatar
+            },
+            meId,
+            phoneStatus,
+            showDateDividers,
+            chatBackground: backgroundImage || ''
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.download = `whatsapp-chat-data-${new Date().toISOString().slice(0, 10)}.json`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleImportState = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target?.result as string) as ImportedData;
+                if (onStateImport) {
+                    onStateImport(importedData);
+                }
+                // Reset file input
+                if (importFileRef.current) {
+                    importFileRef.current.value = '';
+                }
+            } catch (error) {
+                console.error('Error importing data:', error);
+                alert('Error importing data. Please check if the file is valid.');
+            }
+        };
+        reader.readAsText(file);
     };
 
     // Identify system date messages
@@ -548,14 +617,36 @@ export default function ChatPreview({
                 </div>
             </div>
 
-            {/* Export button outside phone UI */}
-            <div className="mt-4 flex justify-center">
+            {/* Export/Import buttons */}
+            <div className="mt-4 flex flex-col items-center justify-center space-y-2 w-full">
                 <button
                     onClick={exportAsImage}
-                    className="bg-[#25d366] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#00a884] transition shadow-sm"
+                    className="w-full max-w-[200px] bg-[#25d366] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#00a884] transition-colors duration-200 shadow-sm"
                 >
                     Export as Image
                 </button>
+
+                <button
+                    onClick={handleExportState}
+                    className="w-full max-w-[200px] bg-[#25d366] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#00a884] transition-colors duration-200 shadow-sm"
+                >
+                    Export Chat Data
+                </button>
+
+                <div className="relative w-full max-w-[200px] bg-[#25d366] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#00a884]">
+                    <label htmlFor="importFile" className="cursor-pointer">
+                        Import Chat Data
+                    </label>
+                    <input
+                        ref={importFileRef}
+                        id="importFile"
+                        type="file"
+                        accept=".json"
+                        onChange={handleImportState}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        placeholder='Import Chat Data'
+                    />
+                </div>
             </div>
         </div>
     );
