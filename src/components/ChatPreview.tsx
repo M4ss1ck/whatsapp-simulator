@@ -533,19 +533,30 @@ export default function ChatPreview({
                                                                 </button>
 
                                                                 {/* Waveform */}
-                                                                <div className="flex-1 h-[26px]">
-                                                                    <div className="w-full h-full flex items-center">
-                                                                        {[...Array(40)].map((_, i) => (
-                                                                            <div
-                                                                                key={i}
-                                                                                className={`flex-1 mx-[0.5px] ${isMe ? 'bg-[#2d7c64]' : 'bg-[#8696a0]'} opacity-40`}
-                                                                                style={{
-                                                                                    height: `${Math.abs(Math.sin((i + 1) * 0.5) * 100)}%`,
-                                                                                    minHeight: '15%',
-                                                                                    maxHeight: '95%'
-                                                                                }}
-                                                                            />
-                                                                        ))}
+                                                                <div className="flex-1 h-[26px] relative">
+                                                                    {/* Waveform bars */}
+                                                                    <div className="w-full h-full flex items-center relative">
+                                                                        {[...Array(40)].map((_, i) => {
+                                                                            // Add randomness to the sine wave
+                                                                            const randomFactor = 0.3 + Math.random() * 0.4; // Random factor between 0.3 and 0.7
+                                                                            const height = Math.abs(Math.sin((i + 1) * randomFactor) * 100);
+
+                                                                            return (
+                                                                                <div
+                                                                                    key={i}
+                                                                                    className={`flex-1 mx-[0.5px] transition-all duration-200 bg-[#8696a0] border-[#8696a0]`}
+                                                                                    style={{
+                                                                                        height: `${height}%`,
+                                                                                        minHeight: '15%',
+                                                                                        maxHeight: '95%',
+                                                                                        borderWidth: '1px',
+                                                                                        borderStyle: 'solid',
+                                                                                        borderRadius: '2px',
+                                                                                        opacity: 0.8
+                                                                                    }}
+                                                                                />
+                                                                            );
+                                                                        })}
                                                                     </div>
                                                                 </div>
 

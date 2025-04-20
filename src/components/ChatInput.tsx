@@ -70,6 +70,15 @@ export default function ChatInput({
             return;
         }
 
+        // Validate audio duration format (mm:ss)
+        if (messageType === 'audio') {
+            const durationPattern = /^([0-5]?[0-9]):([0-5][0-9])$/;
+            if (!durationPattern.test(audioDuration)) {
+                alert('Please enter a valid duration in mm:ss format (e.g., 2:30)');
+                return;
+            }
+        }
+
         if (messageType === 'image') {
             if (imageData === null && !imageUrl) {
                 alert('Please select an image or enter an image URL');
@@ -205,17 +214,30 @@ export default function ChatInput({
                 </div>
             ) : messageType === 'audio' ? (
                 <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Audio Duration (HH:MM:SS):</label>
+                    <label className="block text-sm font-medium mb-1">Audio Duration (mm:ss):</label>
                     <input
                         type="text"
                         value={audioDuration}
-                        onChange={(e) => setAudioDuration(e.target.value)}
-                        placeholder="00:00:00"
+                        onChange={(e) => {
+                            // Only allow numbers and colon
+                            const value = e.target.value.replace(/[^\d:]/g, '');
+                            // Ensure only one colon
+                            const parts = value.split(':');
+                            if (parts.length > 2) return;
+                            // Limit minutes and seconds to valid ranges
+                            if (parts.length === 2) {
+                                const [min, sec] = parts;
+                                if (min.length > 2 || (sec && sec.length > 2)) return;
+                                if (parseInt(min) > 59 || parseInt(sec) > 59) return;
+                            }
+                            setAudioDuration(value);
+                        }}
+                        placeholder="2:30"
                         className="w-full p-2 border rounded"
-                        pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                        pattern="^[0-5]?[0-9]:[0-5][0-9]$"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                        Enter duration in HH:MM:SS format (e.g., 00:01:30 for 1 minute and 30 seconds)
+                        Enter duration in mm:ss format (e.g., 2:30 for 2 minutes and 30 seconds)
                     </p>
                 </div>
             ) : (
