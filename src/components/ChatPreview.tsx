@@ -55,7 +55,15 @@ export default function ChatPreview({
     const containerRef = useRef<HTMLDivElement>(null);
     const phoneRef = useRef<HTMLDivElement>(null);
     const importFileRef = useRef<HTMLInputElement>(null);
-    const [conversationTitle, setConversationTitle] = useState('My WhatsApp Chat');
+    const [conversationTitle, setConversationTitle] = useState(() => {
+        const saved = localStorage.getItem('conversationTitle');
+        return saved || 'My WhatsApp Chat';
+    });
+
+    // Save conversation title to localStorage when it changes
+    useEffect(() => {
+        localStorage.setItem('conversationTitle', conversationTitle);
+    }, [conversationTitle]);
 
     const getParticipantById = (id: string): Participant | undefined => {
         return participants.find(p => p.id === id);

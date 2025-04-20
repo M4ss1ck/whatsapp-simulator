@@ -28,6 +28,17 @@ interface ImportedData {
   chatBackground: string;
 }
 
+// Local storage keys
+const STORAGE_KEYS = {
+  STATE: 'whatsapp_simulator_state',
+  PREVIEW_ON_RIGHT: 'previewOnRight',
+  DARK_MODE: 'darkMode'
+} as const;
+
+interface StoredMessage extends Omit<Message, 'timestamp'> {
+  timestamp: string;
+}
+
 // Create a link element for the favicon
 const createFaviconLink = () => {
   const link = document.getElementById('favicon') as HTMLLinkElement || document.createElement('link');
@@ -46,18 +57,18 @@ function App() {
 
   // Initialize preview position from localStorage or default to left
   const [previewOnRight, setPreviewOnRight] = useState(() => {
-    const saved = localStorage.getItem('previewOnRight');
+    const saved = localStorage.getItem(STORAGE_KEYS.PREVIEW_ON_RIGHT);
     return saved ? JSON.parse(saved) : false;
   });
 
   // Save previewOnRight preference to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('previewOnRight', JSON.stringify(previewOnRight));
+    localStorage.setItem(STORAGE_KEYS.PREVIEW_ON_RIGHT, JSON.stringify(previewOnRight));
   }, [previewOnRight]);
 
   // Initialize dark mode from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem('darkMode');
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.DARK_MODE);
     const prefersDark = savedTheme !== null ? JSON.parse(savedTheme) : true;
     document.documentElement.classList.toggle('dark', prefersDark);
   }, []);
@@ -66,29 +77,65 @@ function App() {
   const toggleTheme = () => {
     const isDark = document.documentElement.classList.contains('dark');
     document.documentElement.classList.toggle('dark', !isDark);
-    localStorage.setItem('darkMode', JSON.stringify(!isDark));
+    localStorage.setItem(STORAGE_KEYS.DARK_MODE, JSON.stringify(!isDark));
   };
 
-  const [state, setState] = useState<WhatsAppState>({
-    participants: [],
-    messages: [],
-    chatSettings: {
-      mode: 'group',
-      title: 'Group Chat',
-      avatar: null
-    },
-    meId: null,
-    phoneStatus: {
-      batteryLevel: 100,
-      customTime: null
+  // Initialize state from localStorage or use default values
+  const [state, setState] = useState<WhatsAppState>(() => {
+    const savedState = localStorage.getItem(STORAGE_KEYS.STATE);
+    if (savedState) {
+      const parsedState = JSON.parse(savedState);
+      // Convert timestamp strings back to Date objects
+      return {
+        ...parsedState,
+        messages: parsedState.messages.map((msg: StoredMessage) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }))
+      };
     }
-  })
+    return {
+      participants: [],
+      messages: [],
+      chatSettings: {
+        mode: 'group',
+        title: 'Group Chat',
+        avatar: null
+      },
+      meId: null,
+      phoneStatus: {
+        batteryLevel: 100,
+        customTime: null
+      }
+    };
+  });
 
-  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null)
-  const [showDateDividers, setShowDateDividers] = useState(true)
-  const [customDateText, setCustomDateText] = useState('')
-  const [chatBackground, setChatBackground] = useState('')
-  const [replyToMessage, setReplyToMessage] = useState<Message | undefined>(undefined)
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(state));
+  }, [state]);
+
+  // Initialize UI state from localStorage or use defaults
+  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
+  const [showDateDividers, setShowDateDividers] = useState(() => {
+    const saved = localStorage.getItem('showDateDividers');
+    return saved ? JSON.parse(saved) : true;
+  });
+  const [customDateText, setCustomDateText] = useState('');
+  const [chatBackground, setChatBackground] = useState(() => {
+    const saved = localStorage.getItem('chatBackground');
+    return saved || '';
+  });
+  const [replyToMessage, setReplyToMessage] = useState<Message | undefined>(undefined);
+
+  // Save UI preferences to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('showDateDividers', JSON.stringify(showDateDividers));
+  }, [showDateDividers]);
+
+  useEffect(() => {
+    localStorage.setItem('chatBackground', chatBackground);
+  }, [chatBackground]);
 
   const handleAddParticipant = (newParticipant: Omit<Participant, 'id'>) => {
     const participant = {
