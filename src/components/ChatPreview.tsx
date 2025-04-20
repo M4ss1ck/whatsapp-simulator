@@ -409,7 +409,7 @@ export default function ChatPreview({
 
                     {/* Chat container */}
                     <div
-                        className="p-3 h-[500px] overflow-y-auto custom-scrollbar"
+                        className="p-3 h-[500px] overflow-y-auto custom-scrollbar overflow-x-hidden"
                     >
                         {processedMessages.length === 0 ? (
                             <div className="flex items-center justify-center h-full text-gray-700">
