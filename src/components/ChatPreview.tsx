@@ -606,7 +606,7 @@ export default function ChatPreview({
 
                     {/* Bottom input area (visual only) */}
                     <div
-                        className="p-2 flex items-center relative"
+                        className="p-2 pt-1 flex items-center relative bg-transparent"
                     >
                         {/* Input content - above the overlay */}
                         <div className="flex-1 flex items-center bg-[#ffffff] rounded-full px-3 py-2 mr-2 z-10 relative">
