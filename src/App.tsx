@@ -312,9 +312,9 @@ function App() {
   };
 
   return (
-    <div className="container mx-auto px-4 min-h-screen">
-      <div className="sticky top-0 py-4 z-20 flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-center mx-auto">WhatsApp Conversation Simulator</h1>
+    <div className="container mx-auto px-4 pt-0 min-h-screen">
+      <div className="py-4 z-20 flex justify-between items-center my-0 mb-8">
+        <h1 className="text-sm lg:text-3xl font-bold text-center mx-auto">WhatsApp Conversation Simulator</h1>
         <button
           onClick={toggleTheme}
           className="absolute right-4 p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
