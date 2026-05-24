@@ -1,4 +1,4 @@
-// Sibling source of truth: /home/massick/Trabajo/web/whatsapp-renderer/src/remotion/components/ChatPhone.tsx
+// Sibling source of truth: whatsapp-renderer/src/remotion/components/ChatPhone.tsx
 import { useMemo, type Ref } from 'react';
 import { Battery100Icon } from '@heroicons/react/24/solid';
 import { Message, Participant, PhoneStatusBar } from '../types';
@@ -156,21 +156,21 @@ export default function ChatPhone({
 
   const messagesByDate = shouldGroupByDate
     ? processedMessages.reduce<Record<string, Message[]>>((groups, message) => {
-        if (isSystemDateMessage(message)) return groups;
+      if (isSystemDateMessage(message)) return groups;
 
-        const dateKey = message.timestamp.toLocaleDateString(locale, {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          timeZone
-        });
+      const dateKey = message.timestamp.toLocaleDateString(locale, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        timeZone
+      });
 
-        if (!groups[dateKey]) {
-          groups[dateKey] = [];
-        }
-        groups[dateKey].push(message);
-        return groups;
-      }, {})
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(message);
+      return groups;
+    }, {})
     : { all: processedMessages };
 
   const otherParticipant = mode === 'private' && meId
