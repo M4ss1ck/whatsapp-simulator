@@ -13,6 +13,18 @@ export interface RenderRequest {
   inputProps: unknown;
 }
 
+export class ApiError extends Error {
+  status: number;
+  details?: unknown;
+
+  constructor(message: string, status: number, details?: unknown) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.details = details;
+  }
+}
+
 export const getRemotionApiBase = () => {
   const base = import.meta.env.VITE_REMOTION_API_URL;
   return base ? base.replace(/\/$/, '') : '';
@@ -22,12 +34,22 @@ const parseError = async (response: Response) => {
   try {
     const data = await response.json();
     if (data && typeof data.error === 'string') {
-      return data.error;
+      return {
+        message: data.error,
+        details: data
+      };
     }
-  } catch (error) {
+    return {
+      message: response.statusText || 'Unknown error',
+      details: data
+    };
+  } catch {
     // ignore JSON parsing errors
   }
-  return response.statusText || 'Unknown error';
+  return {
+    message: response.statusText || 'Unknown error',
+    details: undefined
+  };
 };
 
 export const createRemotionRender = async (request: RenderRequest): Promise<RenderJob> => {
@@ -45,8 +67,8 @@ export const createRemotionRender = async (request: RenderRequest): Promise<Rend
   });
 
   if (!response.ok) {
-    const message = await parseError(response);
-    throw new Error(message);
+    const parsed = await parseError(response);
+    throw new ApiError(parsed.message, response.status, parsed.details);
   }
 
   return response.json();
@@ -61,8 +83,8 @@ export const getRemotionRenderStatus = async (id: string): Promise<RenderJob> =>
   const response = await fetch(`${base}/render/${id}`);
 
   if (!response.ok) {
-    const message = await parseError(response);
-    throw new Error(message);
+    const parsed = await parseError(response);
+    throw new ApiError(parsed.message, response.status, parsed.details);
   }
 
   return response.json();

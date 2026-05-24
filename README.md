@@ -51,6 +51,9 @@ VITE_REMOTION_COMPOSITION_ID=ConversationVideo
 ```
 The renderer service should expose `POST /render` and `GET /render/:id` endpoints.
 
+For full local setup and smoke-test steps (Docker Compose and native renderer paths), see:
+- `../whatsapp-renderer/README.md` -> **Local End-to-End Test**
+
 ## Components
 
 ### Chat Preview
