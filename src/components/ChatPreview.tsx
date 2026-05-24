@@ -64,7 +64,13 @@ export default function ChatPreview({
   const [renderError, setRenderError] = useState<string | null>(null);
 
   const remotionApiBase = getRemotionApiBase();
-  const remotionConfigured = Boolean(remotionApiBase);
+  const remotionCompositionId = import.meta.env.VITE_REMOTION_COMPOSITION_ID?.trim() || '';
+  const missingRendererVars = [
+    !remotionApiBase ? 'VITE_REMOTION_API_URL' : null,
+    !remotionCompositionId ? 'VITE_REMOTION_COMPOSITION_ID' : null
+  ].filter(Boolean) as string[];
+  const remotionConfigured = missingRendererVars.length === 0;
+  const missingRendererVarsMessage = `Renderer is not configured. Missing: ${missingRendererVars.join(', ')}.`;
 
   const otherParticipant = mode === 'private' && meId
     ? participants.find((participant) => participant.id !== meId)
@@ -94,7 +100,7 @@ export default function ChatPreview({
   const renderStatusQuery = useQuery({
     queryKey: ['render', activeJobId],
     queryFn: () => getRemotionRenderStatus(activeJobId!),
-    enabled: Boolean(activeJobId),
+    enabled: Boolean(activeJobId && remotionConfigured),
     refetchInterval: (query) => {
       const status = query.state.data?.status;
       if (status === 'done' || status === 'error') {
@@ -146,10 +152,8 @@ export default function ChatPreview({
       chatBackground: backgroundImage || ''
     });
 
-    const compositionId = import.meta.env.VITE_REMOTION_COMPOSITION_ID;
-
     return {
-      compositionId: compositionId || undefined,
+      compositionId: remotionCompositionId,
       inputProps: exportData
     };
   };
@@ -158,7 +162,6 @@ export default function ChatPreview({
     setRenderError(null);
 
     if (!remotionConfigured) {
-      setRenderError('Remotion API URL is not configured.');
       return;
     }
 
@@ -315,6 +318,7 @@ export default function ChatPreview({
         <button
           onClick={() => startRender(false)}
           disabled={!remotionConfigured || renderMutation.isPending || hasActiveJob}
+          title={!remotionConfigured ? missingRendererVarsMessage : undefined}
           className={`w-full max-w-[200px] px-6 py-2 rounded-lg font-medium transition-colors duration-200 shadow-sm ${
             !remotionConfigured || renderMutation.isPending || hasActiveJob
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -324,7 +328,7 @@ export default function ChatPreview({
           {renderMutation.isPending ? 'Starting Render...' : 'Render Video'}
         </button>
 
-        {hasActiveJob && (
+        {remotionConfigured && hasActiveJob && (
           <>
             <div className="text-xs text-gray-600 text-center">
               Status: {currentStatus || 'checking...'}
@@ -386,7 +390,7 @@ export default function ChatPreview({
           </>
         )}
 
-        {renderError && (
+        {remotionConfigured && renderError && (
           <div className="text-xs text-red-600 text-center max-w-[240px]">
             {renderError}
           </div>
