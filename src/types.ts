@@ -18,6 +18,10 @@ export interface Message {
     replyToType?: 'text' | 'audio' | 'image'; // Type of the message being replied to
 }
 
+export type MessageJson = Omit<Message, 'timestamp'> & {
+    timestamp: string;
+};
+
 export interface ChatSettings {
     mode: 'private' | 'group';
     title: string;
@@ -35,4 +39,15 @@ export interface WhatsAppState {
     chatSettings: ChatSettings;
     meId: string | null;
     phoneStatus: PhoneStatusBar;
-} 
+}
+
+export interface ExportedChatData {
+    participants: Participant[];
+    messages: MessageJson[];
+    chatSettings: ChatSettings;
+    meId: string | null;
+    phoneStatus: PhoneStatusBar;
+    showDateDividers?: boolean;
+    chatBackground?: string;
+    conversationTitle?: string;
+}

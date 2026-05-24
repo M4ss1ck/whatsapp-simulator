@@ -11,6 +11,7 @@ Create realistic WhatsApp chat screenshots with this simulator. Perfect for mock
 - **Phone Status Settings**: Customize battery level and time display
 - **Background Options**: Use the default WhatsApp pattern or upload your own background
 - **Export as Image**: Save your chat mockup as a PNG image with a single click
+- **Render Video (Remotion)**: Trigger a render via an external Remotion API (renderer service)
 - **Dark/Light Theme Support**: Matches your system preferences
 - **Responsive Design**: Works on desktop and mobile devices
 
@@ -39,6 +40,19 @@ npm run dev
 3. **Customize Appearance**: Adjust the phone status bar, background, and other settings
 4. **Preview**: See changes instantly in the live preview
 5. **Export**: Click the "Export as Image" button to save your mockup
+
+### Video Rendering (Optional)
+
+To enable video rendering, set the Remotion API endpoint for the frontend:
+
+```bash
+VITE_REMOTION_API_URL=https://your-renderer.example.com
+VITE_REMOTION_COMPOSITION_ID=ConversationVideo
+```
+The renderer service should expose `POST /render` and `GET /render/:id` endpoints.
+
+For full local setup and smoke-test steps (Docker Compose and native renderer paths), see:
+- `../whatsapp-renderer/README.md` -> **Local End-to-End Test**
 
 ## Components
 

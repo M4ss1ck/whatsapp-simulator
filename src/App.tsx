@@ -7,26 +7,9 @@ import ChatSettings, { ChatMode } from './components/ChatSettings'
 import PhoneStatusSettings from './components/PhoneStatusSettings'
 import DateSettings from './components/DateSettings'
 import BackgroundSettings from './components/BackgroundSettings'
-import { Message, Participant, WhatsAppState, PhoneStatusBar } from './types'
+import { ExportedChatData, Message, MessageJson, Participant, PhoneStatusBar, WhatsAppState } from './types'
+import { deserializeMessages } from './utils/chatSerialization'
 import './App.css'
-
-interface ImportedMessage extends Omit<Message, 'timestamp'> {
-  timestamp: string;
-}
-
-interface ImportedData {
-  participants: Participant[];
-  messages: ImportedMessage[];
-  chatSettings: {
-    mode: ChatMode;
-    title: string;
-    avatar: string | null;
-  };
-  meId: string | null;
-  phoneStatus: PhoneStatusBar;
-  showDateDividers: boolean;
-  chatBackground: string;
-}
 
 // Local storage keys
 const STORAGE_KEYS = {
@@ -34,10 +17,6 @@ const STORAGE_KEYS = {
   PREVIEW_ON_RIGHT: 'previewOnRight',
   DARK_MODE: 'darkMode'
 } as const;
-
-interface StoredMessage extends Omit<Message, 'timestamp'> {
-  timestamp: string;
-}
 
 // Create a link element for the favicon
 const createFaviconLink = () => {
@@ -88,10 +67,7 @@ function App() {
       // Convert timestamp strings back to Date objects
       return {
         ...parsedState,
-        messages: parsedState.messages.map((msg: StoredMessage) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp)
-        }))
+        messages: deserializeMessages(parsedState.messages as MessageJson[])
       };
     }
     return {
@@ -288,12 +264,8 @@ function App() {
     setReplyToMessage(undefined);
   };
 
-  const handleStateImport = (importedData: ImportedData) => {
-    // Restore dates from JSON (they come as strings)
-    const processedMessages = importedData.messages.map((msg: ImportedMessage) => ({
-      ...msg,
-      timestamp: new Date(msg.timestamp)
-    }));
+  const handleStateImport = (importedData: ExportedChatData) => {
+    const processedMessages = deserializeMessages(importedData.messages ?? []);
 
     setState({
       participants: importedData.participants,
