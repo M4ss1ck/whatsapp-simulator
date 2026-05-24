@@ -1,3 +1,4 @@
+// Sibling source of truth: /home/massick/Trabajo/web/whatsapp-renderer/src/remotion/components/ChatPhone.tsx
 import { useMemo, type Ref } from 'react';
 import { Battery100Icon } from '@heroicons/react/24/solid';
 import { Message, Participant, PhoneStatusBar } from '../types';
