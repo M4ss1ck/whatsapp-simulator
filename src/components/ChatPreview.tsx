@@ -275,14 +275,27 @@ export default function ChatPreview({
         )}
 
         {renderJob?.outputUrl && (
-          <a
-            href={renderJob.outputUrl}
-            target="_blank"
-            rel="noreferrer"
+          <button
+            onClick={async () => {
+              if (!renderJob.outputUrl) return;
+              try {
+                const response = await fetch(renderJob.outputUrl);
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const safeTitle = conversationTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+                link.download = `${safeTitle}-${new Date().toISOString().slice(0, 10)}.mp4`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+              } catch (error) {
+                setRenderError(error instanceof Error ? error.message : 'Failed to download video.');
+              }
+            }}
             className="text-xs text-[#128c7e] underline"
           >
             Download Video
-          </a>
+          </button>
         )}
 
         {renderError && (
