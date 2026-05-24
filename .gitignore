@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# skills directories
+.agent
+.agents
+.claude
+.kiro
+
+# local-only planning artifacts
+docs/plans/
